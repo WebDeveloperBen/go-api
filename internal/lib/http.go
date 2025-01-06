@@ -2,7 +2,6 @@ package lib
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,6 +11,34 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// PublicError is an interface that returns a sanitized message for clients
+// while preserving an internal error for logs.
+type PublicError interface {
+	error
+	PublicMessage() string  // sanitized message for API response
+	PrivateMessage() string // detailed error for logs
+}
+
+type StorageError struct {
+	PublicMsg  string // Message for API consumers
+	PrivateMsg string // Detailed message for logs
+}
+
+func (e *StorageError) Error() string {
+	// The "error" interface usually returns something for logs,
+	// but you can choose how you want it to look.
+	return e.PrivateMsg
+}
+
+// To satisfy the PublicError interface:
+func (e *StorageError) PublicMessage() string {
+	return e.PublicMsg
+}
+
+func (e *StorageError) PrivateMessage() string {
+	return e.PrivateMsg
+}
+
 // This holds the successful json response and types it so the response is always sent under the key "data"
 type JSONResponse struct {
 	Data interface{} `json:"data"`
@@ -19,13 +46,8 @@ type JSONResponse struct {
 
 // This holds the error json response and types it so the response is always sent under the key "error"
 type ErrorResponse struct {
-	Error interface{} `json:"error"`
-}
-
-type StorageError struct {
-	PublicMsg  string // Message exposed to the API consumer
-	PrivateMsg string // Detailed error message for internal logging
-	StatusCode int
+	Error     interface{} `json:"error"`
+	RequestID string      `json:"request_id"`
 }
 
 /**
@@ -36,38 +58,7 @@ func NewStorageError(status int, publicMsg, privateMsg string) error {
 	return &StorageError{
 		PublicMsg:  publicMsg,
 		PrivateMsg: privateMsg,
-		StatusCode: status,
 	}
-}
-
-/**
-* implements the std lib error interface
- */
-func (e *StorageError) Error() string {
-	return e.PublicMsg
-}
-
-/**
-* Main error handler for storage layer errors
-* Error will always return inside a slice
-*
- */
-func WriteStorageError(c echo.Context, err error) error {
-	var se *StorageError
-	var errorsArray []interface{}
-
-	if errors.As(err, &se) {
-		// Log the private message
-		Logger.Error().Timestamp().Msg(se.PrivateMsg)
-		// Add the public message to the errors array
-		errorsArray = append(errorsArray, se.PublicMsg)
-		// Return the public message to the client
-		return c.JSON(se.StatusCode, ErrorResponse{Error: errorsArray})
-	}
-
-	// Fallback for generic errors
-	errorsArray = append(errorsArray, "something went wrong")
-	return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: errorsArray})
 }
 
 /**
@@ -75,26 +66,45 @@ func WriteStorageError(c echo.Context, err error) error {
 * Error will always return inside a slice
  */
 func WriteError(c echo.Context, status int, err error) error {
-	// Convert the error message to a slice of errors
-	var errors []interface{}
+	requestID := c.Response().Header().Get(echo.HeaderXRequestID)
 
-	// If the error is an HTTPError from Echo
-	if httpError, ok := err.(*echo.HTTPError); ok {
-		// Check if the HTTPError message is already an ErrorResponse
+	var (
+		logMessage   string        // Detailed error message for logs
+		publicErrors []interface{} // Errors to return to the client
+	)
+
+	// Check if the error implements the PublicError interface
+	if publicErr, ok := err.(PublicError); ok {
+		logMessage = publicErr.PrivateMessage()
+		publicErrors = append(publicErrors, publicErr.PublicMessage())
+	} else if httpError, ok := err.(*echo.HTTPError); ok {
+		// Handle Echo-specific HTTP errors
 		if errResponse, ok := httpError.Message.(ErrorResponse); ok {
-			errors = append(errors, errResponse.Error)
+			publicErrors = append(publicErrors, errResponse.Error)
 		} else {
-			errors = append(errors, httpError.Message)
+			publicErrors = append(publicErrors, httpError.Message)
 		}
+		logMessage = fmt.Sprintf("%v", httpError.Message)
 	} else {
-		errors = append(errors, err.Error())
+		// Generic fallback for other error types
+		logMessage = err.Error()
+		publicErrors = append(publicErrors, "an unexpected error occurred")
 	}
 
-	// Send error report to an external service / RabbitMQ for storage (placeholder)
-	// TODO: Implement actual error reporting logic
+	// Log the error details for debugging
+	Logger.Error().
+		Timestamp().
+		Str("path", c.Request().URL.Path).
+		Str("method", c.Request().Method).
+		Str("request_id", requestID).
+		Str("error", logMessage).
+		Msg("an error occurred")
 
-	// Return the JSON response with errors wrapped in an array
-	return c.JSON(status, ErrorResponse{Error: errors})
+	// Return the sanitized error response to the client
+	return c.JSON(status, ErrorResponse{
+		Error:     publicErrors,
+		RequestID: requestID,
+	})
 }
 
 /**
