@@ -1,0 +1,67 @@
+version: "3"
+
+dotenv: [".env"]
+
+tasks:
+  default:
+    cmds:
+      - task run
+
+  build:
+    desc: Build the Go application binary
+    cmds:
+      - go build -o ./bin/api ./cmd/api
+
+  run:
+    desc: Run the application using Docker Compose and Air for hot reloading
+    cmds:
+      - task build
+      - docker-compose up -d
+      - air
+
+  stop:
+    desc: Stop the Docker Compose environment
+    cmds:
+      - docker-compose down
+
+  test:
+    desc: Run all Go tests
+    cmds:
+      - go test ./...
+
+  db:init:
+    desc: Initialize the database by running setup SQL and creating migrations directory
+    cmds:
+      - psql "${POSTGRES_DSN}" -f ./db/setup.sql
+      - mkdir -p db/migrations
+
+  db:migrate:
+    desc: Run database migrations using Atlas
+    cmds:
+      - atlas migrate apply --dir "file://db/migrations" --url "${POSTGRES_DSN}"
+
+  db:diff:
+    desc: Generate a new database migration
+    cmds:
+      - atlas migrate diff --dir "file://db/migrations" --url "${POSTGRES_DSN}" --to "file://db/schema" --dev-url "docker://postgres"
+
+  db:lint:
+    desc: Lint the database migration files
+    cmds:
+      - atlas migrate lint --dir "file://db/migrations" --dev-url "docker://postgres"
+
+  db:reset:
+    desc: Drop and reinitialize the database
+    cmds:
+      - task db:drop
+      - task db:init
+
+  db:drop:
+    desc: Drop the entire database
+    cmds:
+      - atlas schema clean --url "${POSTGRES_DSN}"
+
+  generate:
+    desc: Generate SQLC code from queries
+    cmds:
+      - sqlc generate
