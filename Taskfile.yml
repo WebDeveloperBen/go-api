@@ -44,12 +44,12 @@ tasks:
     cmds:
       - cd ./db/drizzle && pnpm run studio
 
-  db:generate:
+  db:gen_migrate:
     desc: Generate migrations
     cmds:
       - cd ./db/drizzle && pnpm run generate
 
-  generate:
+  db:gen_query:
     desc: Generate SQLC code from queries
     cmds:
-      - sqlc generate
+      - rm -rf ./internal/repository/postgres && sqlc generate

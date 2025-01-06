@@ -1,7 +1,7 @@
-import { pgTable, text, timestamp } from 'drizzle-orm/pg-core'
-import { users } from './users'
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { users } from "./users";
 
-export const account = pgTable('account', {
+export const account = pgTable("account", {
   id: text().primaryKey(),
   accountId: text().notNull(),
   providerId: text().notNull(),
@@ -11,6 +11,9 @@ export const account = pgTable('account', {
   accessToken: text(),
   refreshToken: text(),
   idToken: text(),
-  expiresAt: timestamp(),
+  expiresAt: timestamp({
+    mode: "date",
+    withTimezone: true,
+  }),
   password: text(),
-})
+});

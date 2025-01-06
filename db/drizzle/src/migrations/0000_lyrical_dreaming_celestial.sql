@@ -6,7 +6,7 @@ CREATE TABLE "account" (
 	"access_token" text,
 	"refresh_token" text,
 	"id_token" text,
-	"expires_at" timestamp,
+	"expires_at" timestamp with time zone,
 	"password" text
 );
 --> statement-breakpoint
@@ -29,8 +29,8 @@ CREATE TABLE "assets" (
 	"metadata" jsonb,
 	"is_public" boolean DEFAULT true NOT NULL,
 	"published" boolean DEFAULT true NOT NULL,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "assets_fileName_unique" UNIQUE("file_name")
 );
 --> statement-breakpoint
@@ -44,8 +44,8 @@ CREATE TABLE "chapters" (
 	"published" boolean DEFAULT false NOT NULL,
 	"title" text NOT NULL,
 	"chapter_number" integer,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "classes_activities" (
@@ -57,8 +57,8 @@ CREATE TABLE "classes_activities" (
 	"day" text,
 	"period" text,
 	"class_id" uuid NOT NULL,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "class_scores" (
@@ -80,8 +80,8 @@ CREATE TABLE "classes" (
 	"description" text,
 	"course_code" text NOT NULL,
 	"duration" integer,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "courses" (
@@ -93,8 +93,8 @@ CREATE TABLE "courses" (
 	"duration" integer,
 	"category" text,
 	"image" text,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "educational_standards" (
@@ -105,8 +105,8 @@ CREATE TABLE "educational_standards" (
 	"category" text NOT NULL,
 	"sub_category" text NOT NULL,
 	"level" integer NOT NULL,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "educations_standards_questions_mapping" (
@@ -122,15 +122,15 @@ CREATE TABLE "enrolments" (
 	"name" text NOT NULL,
 	"tags" text[],
 	"content" jsonb,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "groups_users" (
 	"group_id" uuid,
 	"user_id" text,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "groups" (
@@ -138,8 +138,8 @@ CREATE TABLE "groups" (
 	"name" text NOT NULL,
 	"course_id" uuid,
 	"tags" text[],
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "homework_questions" (
@@ -154,8 +154,8 @@ CREATE TABLE "homework_submissions" (
 	"homework_id" uuid,
 	"progress" integer DEFAULT 0,
 	"content" jsonb,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "homework" (
@@ -164,18 +164,18 @@ CREATE TABLE "homework" (
 	"created_by" text,
 	"tags" text[],
 	"content" jsonb,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"id" text PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-	"name" text NOT NULL,
+	"fullname" text NOT NULL,
 	"email" text NOT NULL,
 	"email_verified" boolean DEFAULT false,
 	"image" text,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -185,8 +185,8 @@ CREATE TABLE "invitees" (
 	"name" text,
 	"invited_by" text NOT NULL,
 	"relation" text,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "jwks" (
@@ -212,8 +212,8 @@ CREATE TABLE "lessons" (
 	"duration" integer,
 	"order_in_subject" integer,
 	"image" text,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "unique_lesson_key" UNIQUE("title","section_id","course_id")
 );
 --> statement-breakpoint
@@ -222,8 +222,8 @@ CREATE TABLE "modules" (
 	"title" text,
 	"description" text,
 	"asset" text,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "notes" (
@@ -231,8 +231,8 @@ CREATE TABLE "notes" (
 	"user_id" text NOT NULL,
 	"content" text,
 	"lesson_id" uuid,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "organisations" (
@@ -240,24 +240,24 @@ CREATE TABLE "organisations" (
 	"name" text NOT NULL,
 	"address" text,
 	"contact_details" text,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "organisation_users" (
 	"organisation_id" uuid,
 	"user_id" text,
 	"role_id" integer,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "outcomes" (
 	"outcome_id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"code" text NOT NULL,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "outcomes_code_key" UNIQUE("code")
 );
 --> statement-breakpoint
@@ -267,8 +267,8 @@ CREATE TABLE "profiles" (
 	"egl" integer,
 	"enrolled_at" text,
 	"terms_accepted" boolean DEFAULT false NOT NULL,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "questions" (
@@ -291,8 +291,8 @@ CREATE TABLE "quizzes" (
 	"description" text,
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"total_questions" integer,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "quizzes_questions" (
@@ -304,8 +304,8 @@ CREATE TABLE "quizzes_questions" (
 	"type" text,
 	"question_order" integer,
 	"resources" jsonb[],
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "random_questions" (
@@ -331,16 +331,16 @@ CREATE TABLE "resources" (
 	"etag" text,
 	"provider" text DEFAULT 'internal' NOT NULL,
 	"uri" text,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "roles" (
 	"role_id" serial PRIMARY KEY NOT NULL,
 	"name" text,
 	"description" text,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "sections" (
@@ -349,8 +349,8 @@ CREATE TABLE "sections" (
 	"name" text NOT NULL,
 	"description" text,
 	"order" integer,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "session" (
@@ -367,8 +367,8 @@ CREATE TABLE "user_roles" (
 	"role_id" serial NOT NULL,
 	"context_id" uuid NOT NULL,
 	"context_type" text NOT NULL,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "user_roles_user_id_role_key" UNIQUE("user_id","role_id")
 );
 --> statement-breakpoint
@@ -386,8 +386,8 @@ CREATE TABLE "weekly_planner" (
 	"term" text NOT NULL,
 	"week" integer NOT NULL,
 	"content" jsonb,
-	"updated_at" timestamp DEFAULT now(),
-	"created_at" timestamp DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

@@ -1,7 +1,8 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "./db/sqlc"
+    queries: "./db/sqlc_queries"
+    schema: "./db/drizzle/src/migrations"
     gen:
       go:
         package: "repository"
@@ -13,12 +14,13 @@ sql:
             go_type:
               import: "github.com/google/uuid"
               type: "UUID"
-          - db_type: "timestamp with time zone"
+          - db_type: "pg_catalog.timestamptz"
             go_type:
               import: "time"
               type: "Time"
-          - db_type: "timestamp with time zone"
+          - db_type: "pg_catalog.timestamptz"
             go_type:
               import: "time"
               type: "Time"
+              pointer: true
             nullable: true
