@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/webdeveloperben/go-api/internal/lib"
-	repository "github.com/webdeveloperben/go-api/internal/repository/postgres"
+	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
 )
 
 // Interface for the presence handler
@@ -42,7 +42,7 @@ func (h *PresenceHandler) HandleGetPresence(c echo.Context) error {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	presence, err := h.Service.GetPresence(c.Request().Context(), parsedUUID)
+	presence, err := h.Service.GetPresence(c, parsedUUID)
 	if err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
@@ -57,7 +57,7 @@ func (h *PresenceHandler) HandleCreatePresence(c echo.Context) error {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	if err := h.Service.CreatePresence(c.Request().Context(), presence); err != nil {
+	if err := h.Service.CreatePresence(c, presence); err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 
@@ -66,12 +66,12 @@ func (h *PresenceHandler) HandleCreatePresence(c echo.Context) error {
 
 // Update presence record
 func (h *PresenceHandler) HandleUpdatePresence(c echo.Context) error {
-	var presence repository.InsertPresenceParams
+	var presence repository.UpdatePresenceParams
 	if err := c.Bind(&presence); err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	if err := h.Service.UpdatePresence(c.Request().Context(), presence); err != nil {
+	if err := h.Service.UpdatePresence(c, presence); err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 
@@ -84,7 +84,7 @@ func (h *PresenceHandler) HandleDeletePresence(c echo.Context) error {
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
-	if err := h.Service.DeletePresence(c.Request().Context(), parsedUUID); err != nil {
+	if err := h.Service.DeletePresence(c, parsedUUID); err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 	return lib.WriteJSON(c, http.StatusOK, "presence deleted")

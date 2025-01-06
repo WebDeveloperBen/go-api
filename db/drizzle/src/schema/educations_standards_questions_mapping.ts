@@ -1,9 +1,9 @@
-import { pgTable, primaryKey, uuid } from 'drizzle-orm/pg-core'
-import { educational_standards } from './educational_standards'
-import { questions } from './questions'
+import { pgTable, primaryKey, uuid } from "drizzle-orm/pg-core";
+import { educational_standards } from "./educational_standards";
+import { questions } from "./questions";
 
 export const educations_standards_questions_mapping = pgTable(
-  'educations_standards_questions_mapping',
+  "educations_standards_questions_mapping",
   {
     question_id: uuid()
       .notNull()
@@ -12,12 +12,10 @@ export const educations_standards_questions_mapping = pgTable(
       .notNull()
       .references(() => educational_standards.id),
   },
-  (table) => {
-    return {
-      educations_standards_questions_mapping_pkey: primaryKey({
-        columns: [table.question_id, table.standard_id],
-        name: 'educations_standards_questions_mapping_pkey',
-      }),
-    }
-  }
-)
+  (table) => [
+    primaryKey({
+      columns: [table.question_id, table.standard_id],
+      name: "educations_standards_questions_mapping_pkey",
+    }),
+  ],
+);

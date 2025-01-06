@@ -17,7 +17,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.34.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.34.0
-	gotest.tools/v3 v3.5.1
+	gotest.tools v2.2.0+incompatible
 )
 
 require (

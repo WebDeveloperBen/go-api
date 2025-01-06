@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm'
 import {
   boolean,
   integer,
@@ -6,13 +5,11 @@ import {
   pgTable,
   text,
   uuid,
-} from 'drizzle-orm/pg-core'
-import { timestamps } from './columns/helpers'
+} from "drizzle-orm/pg-core";
+import { timestamps } from "./columns/helpers";
 
-export const assets = pgTable('assets', {
-  id: uuid()
-    .primaryKey()
-    .$defaultFn(() => sql`uuid_generate_v4()`),
+export const assets = pgTable("assets", {
+  id: uuid().primaryKey().notNull().defaultRandom(),
   fileName: text().notNull().unique(),
   contentType: text().notNull(),
   eTag: text(), //for caching
@@ -23,4 +20,4 @@ export const assets = pgTable('assets', {
   isPublic: boolean().notNull().default(true),
   published: boolean().default(true).notNull(),
   ...timestamps,
-})
+});

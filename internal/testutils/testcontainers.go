@@ -20,7 +20,7 @@ func SetupPostgresContainer(t *testing.T) (string, func()) {
 
 	// Get the absolute path to the migration directory
 	_, filename, _, _ := runtime.Caller(0) // Get the current file path
-	migrationsDir := filepath.Join(filepath.Dir(filename), "../../db/migrations")
+	migrationsDir := filepath.Join(filepath.Dir(filename), "../../db/drizzle/src/migrations")
 
 	// Set up the PostgreSQL container
 	pgContainer, err := postgres.Run(ctx,
@@ -49,11 +49,12 @@ func SetupPostgresContainer(t *testing.T) (string, func()) {
 }
 
 func runMigrations(connStr string, migrationsDir string) error {
-	// Construct the Atlas command
-	cmd := exec.Command("atlas", "migrate", "apply", "--dir", "file://"+migrationsDir, "--url", connStr)
+	// Get the absolute path to the migration directory
+	_, filename, _, _ := runtime.Caller(0) // Get the current file path
+	migratorLoc := filepath.Join(filepath.Dir(filename), "../../db/drizzle/migrate.mjs")
 
-	// Set environment variables for Atlas if needed
-	cmd.Env = append(cmd.Env, "POSTGRES_DSN="+connStr)
+	// Construct the command to run the Node.js script
+	cmd := exec.Command("node", migratorLoc, connStr, migrationsDir)
 
 	// Run the command
 	output, err := cmd.CombinedOutput()
@@ -61,5 +62,6 @@ func runMigrations(connStr string, migrationsDir string) error {
 		return fmt.Errorf("failed to run migrations: %v\n%s", err, string(output))
 	}
 
+	fmt.Println(string(output)) // Optional: Log the output for debugging
 	return nil
 }

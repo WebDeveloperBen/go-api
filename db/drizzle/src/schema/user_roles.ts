@@ -7,9 +7,7 @@ export const user_roles = pgTable(
   "user_roles",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    user_id: text()
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+    user_id: uuid().references(() => users.id, { onDelete: "cascade" }),
     role_id: serial()
       .notNull()
       .references(() => roles.role_id, { onDelete: "cascade" }),

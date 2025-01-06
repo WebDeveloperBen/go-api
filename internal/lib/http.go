@@ -11,54 +11,52 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// PublicError is an interface that returns a sanitized message for clients
-// while preserving an internal error for logs.
+// PublicError is an interface that provides sanitized messages for clients
+// and detailed messages for internal logs.
 type PublicError interface {
 	error
-	PublicMessage() string  // sanitized message for API response
-	PrivateMessage() string // detailed error for logs
+	PublicMessage() string  // Message for the API response
+	PrivateMessage() string // Message for internal logs
 }
 
-type StorageError struct {
+// BaseError provides a reusable implementation of PublicError.
+type BaseError struct {
 	PublicMsg  string // Message for API consumers
 	PrivateMsg string // Detailed message for logs
 }
 
-func (e *StorageError) Error() string {
-	// The "error" interface usually returns something for logs,
-	// but you can choose how you want it to look.
+// Error implements the `error` interface.
+func (e *BaseError) Error() string {
 	return e.PrivateMsg
 }
 
-// To satisfy the PublicError interface:
-func (e *StorageError) PublicMessage() string {
+// PublicMessage returns the sanitized error message for the client.
+func (e *BaseError) PublicMessage() string {
 	return e.PublicMsg
 }
 
-func (e *StorageError) PrivateMessage() string {
+// PrivateMessage returns the detailed error message for logs.
+func (e *BaseError) PrivateMessage() string {
 	return e.PrivateMsg
 }
 
-// This holds the successful json response and types it so the response is always sent under the key "data"
+// NewPublicError creates a new BaseError.
+func NewPublicError(publicMsg, privateMsg string) *BaseError {
+	return &BaseError{
+		PublicMsg:  publicMsg,
+		PrivateMsg: privateMsg,
+	}
+}
+
+// JSONResponse represents a successful API response.
 type JSONResponse struct {
 	Data interface{} `json:"data"`
 }
 
-// This holds the error json response and types it so the response is always sent under the key "error"
+// ErrorResponse represents an error API response.
 type ErrorResponse struct {
 	Error     interface{} `json:"error"`
 	RequestID string      `json:"request_id"`
-}
-
-/**
-* Creates a public error struct, to be created in the storage layer to then be standardised in the handler layer using
-* WriteStorageError func
- */
-func NewStorageError(status int, publicMsg, privateMsg string) error {
-	return &StorageError{
-		PublicMsg:  publicMsg,
-		PrivateMsg: privateMsg,
-	}
 }
 
 /**
@@ -74,18 +72,22 @@ func WriteError(c echo.Context, status int, err error) error {
 	)
 
 	// Check if the error implements the PublicError interface
-	if publicErr, ok := err.(PublicError); ok {
-		logMessage = publicErr.PrivateMessage()
-		publicErrors = append(publicErrors, publicErr.PublicMessage())
-	} else if httpError, ok := err.(*echo.HTTPError); ok {
+	switch e := err.(type) {
+	case PublicError:
+		// Handle PublicError, which includes BaseError
+		logMessage = e.PrivateMessage()
+		publicErrors = append(publicErrors, e.PublicMessage())
+
+	case *echo.HTTPError:
 		// Handle Echo-specific HTTP errors
-		if errResponse, ok := httpError.Message.(ErrorResponse); ok {
+		if errResponse, ok := e.Message.(ErrorResponse); ok {
 			publicErrors = append(publicErrors, errResponse.Error)
 		} else {
-			publicErrors = append(publicErrors, httpError.Message)
+			publicErrors = append(publicErrors, e.Message)
 		}
-		logMessage = fmt.Sprintf("%v", httpError.Message)
-	} else {
+		logMessage = fmt.Sprintf("%v", e.Message)
+
+	default:
 		// Generic fallback for other error types
 		logMessage = err.Error()
 		publicErrors = append(publicErrors, "an unexpected error occurred")
@@ -112,11 +114,12 @@ func WriteError(c echo.Context, status int, err error) error {
 * Data will always be a slice.
  */
 func WriteJSON(c echo.Context, status int, v interface{}) error {
-	// Use reflection to check the type of v
-	val := reflect.ValueOf(v)
 	var data interface{}
 
-	if val.Kind() == reflect.Slice {
+	val := reflect.ValueOf(v)
+	if val.Kind() == reflect.Slice && val.IsNil() {
+		data = []interface{}{} // Convert nil slice to empty slice
+	} else if val.Kind() == reflect.Slice {
 		data = v
 	} else {
 		data = []interface{}{v}

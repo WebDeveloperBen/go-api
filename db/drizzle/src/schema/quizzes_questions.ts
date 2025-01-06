@@ -1,9 +1,9 @@
-import { integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
-import { quizzes } from './quizzes'
-import { timestamps } from './columns/helpers'
+import { integer, jsonb, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { quizzes } from "./quizzes";
+import { timestamps } from "./columns/helpers";
 
-export const quizzes_questions = pgTable('quizzes_questions', {
-  id: uuid().primaryKey().notNull(),
+export const quizzes_questions = pgTable("quizzes_questions", {
+  id: uuid().primaryKey().notNull().defaultRandom(),
   quizzes_id: uuid().references(() => quizzes.id),
   question: text(),
   answer: text(),
@@ -12,4 +12,4 @@ export const quizzes_questions = pgTable('quizzes_questions', {
   question_order: integer(),
   resources: jsonb().array(),
   ...timestamps,
-})
+});

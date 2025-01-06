@@ -9,6 +9,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -39,7 +40,7 @@ DELETE FROM users
 WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id string) (int64, error) {
+func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) (int64, error) {
 	result, err := q.db.Exec(ctx, deleteUser, id)
 	if err != nil {
 		return 0, err
@@ -54,7 +55,7 @@ ORDER BY created_at DESC
 `
 
 type GetAllUsersRow struct {
-	ID            string      `json:"id"`
+	ID            uuid.UUID   `json:"id"`
 	Fullname      string      `json:"fullname"`
 	Email         string      `json:"email"`
 	EmailVerified pgtype.Bool `json:"email_verified"`
@@ -98,7 +99,7 @@ WHERE id = $1
 `
 
 type GetUserRow struct {
-	ID            string      `json:"id"`
+	ID            uuid.UUID   `json:"id"`
 	Fullname      string      `json:"fullname"`
 	Email         string      `json:"email"`
 	EmailVerified pgtype.Bool `json:"email_verified"`
@@ -107,7 +108,7 @@ type GetUserRow struct {
 	UpdatedAt     time.Time   `json:"updated_at"`
 }
 
-func (q *Queries) GetUser(ctx context.Context, id string) (GetUserRow, error) {
+func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (GetUserRow, error) {
 	row := q.db.QueryRow(ctx, getUser, id)
 	var i GetUserRow
 	err := row.Scan(
@@ -129,7 +130,7 @@ WHERE id = $1
 `
 
 type UpdateUserParams struct {
-	ID            string      `json:"id"`
+	ID            uuid.UUID   `json:"id"`
 	Fullname      string      `json:"fullname"`
 	Email         string      `json:"email"`
 	EmailVerified pgtype.Bool `json:"email_verified"`

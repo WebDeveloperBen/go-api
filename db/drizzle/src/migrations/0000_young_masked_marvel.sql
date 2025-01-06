@@ -1,8 +1,8 @@
 CREATE TABLE "account" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
-	"user_id" text NOT NULL,
+	"user_id" uuid NOT NULL,
 	"access_token" text,
 	"refresh_token" text,
 	"id_token" text,
@@ -19,7 +19,7 @@ CREATE TABLE "activity_types" (
 );
 --> statement-breakpoint
 CREATE TABLE "assets" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"file_name" text NOT NULL,
 	"content_type" text NOT NULL,
 	"e_tag" text,
@@ -35,7 +35,7 @@ CREATE TABLE "assets" (
 );
 --> statement-breakpoint
 CREATE TABLE "chapters" (
-	"chapter_id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"lesson_id" uuid NOT NULL,
 	"nav_item_name" text NOT NULL,
 	"description" text,
@@ -63,7 +63,7 @@ CREATE TABLE "classes_activities" (
 --> statement-breakpoint
 CREATE TABLE "class_scores" (
 	"class_id" uuid NOT NULL,
-	"user_id" text NOT NULL,
+	"user_id" uuid,
 	"score" integer NOT NULL,
 	"week" integer NOT NULL,
 	CONSTRAINT "class_scores_pkey" PRIMARY KEY("class_id","user_id","week")
@@ -71,11 +71,11 @@ CREATE TABLE "class_scores" (
 --> statement-breakpoint
 CREATE TABLE "class_users" (
 	"class_id" uuid NOT NULL,
-	"user_id" text NOT NULL
+	"user_id" uuid
 );
 --> statement-breakpoint
 CREATE TABLE "classes" (
-	"class_id" uuid PRIMARY KEY NOT NULL,
+	"class_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
 	"course_code" text NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE "classes" (
 );
 --> statement-breakpoint
 CREATE TABLE "courses" (
-	"courses_id" uuid PRIMARY KEY NOT NULL,
+	"courses_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
 	"chapters" integer,
@@ -118,7 +118,7 @@ CREATE TABLE "educations_standards_questions_mapping" (
 CREATE TABLE "enrolments" (
 	"organisation_id" uuid,
 	"course_id" uuid,
-	"user_id" text,
+	"user_id" uuid,
 	"name" text NOT NULL,
 	"tags" text[],
 	"content" jsonb,
@@ -128,13 +128,13 @@ CREATE TABLE "enrolments" (
 --> statement-breakpoint
 CREATE TABLE "groups_users" (
 	"group_id" uuid,
-	"user_id" text,
+	"user_id" uuid,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "groups" (
-	"group_id" uuid PRIMARY KEY NOT NULL,
+	"group_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"course_id" uuid,
 	"tags" text[],
@@ -143,14 +143,14 @@ CREATE TABLE "groups" (
 );
 --> statement-breakpoint
 CREATE TABLE "homework_questions" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"question_id" uuid,
 	"homework_id" uuid
 );
 --> statement-breakpoint
 CREATE TABLE "homework_submissions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text,
+	"user_id" uuid,
 	"homework_id" uuid,
 	"progress" integer DEFAULT 0,
 	"content" jsonb,
@@ -161,7 +161,7 @@ CREATE TABLE "homework_submissions" (
 CREATE TABLE "homework" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
-	"created_by" text,
+	"created_by" uuid,
 	"tags" text[],
 	"content" jsonb,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -169,7 +169,7 @@ CREATE TABLE "homework" (
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" text PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"fullname" text NOT NULL,
 	"email" text NOT NULL,
 	"email_verified" boolean DEFAULT false,
@@ -180,7 +180,7 @@ CREATE TABLE "users" (
 );
 --> statement-breakpoint
 CREATE TABLE "invitees" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"email" text NOT NULL,
 	"name" text,
 	"invited_by" text NOT NULL,
@@ -190,7 +190,7 @@ CREATE TABLE "invitees" (
 );
 --> statement-breakpoint
 CREATE TABLE "jwks" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"public_key" text,
 	"private_key" text,
 	"created_at" timestamp DEFAULT now() NOT NULL
@@ -203,7 +203,7 @@ CREATE TABLE "lesson_resources" (
 );
 --> statement-breakpoint
 CREATE TABLE "lessons" (
-	"lesson_id" uuid PRIMARY KEY NOT NULL,
+	"lesson_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"section_id" uuid NOT NULL,
 	"course_id" uuid,
 	"title" text NOT NULL,
@@ -227,8 +227,8 @@ CREATE TABLE "modules" (
 );
 --> statement-breakpoint
 CREATE TABLE "notes" (
-	"note_id" uuid PRIMARY KEY NOT NULL,
-	"user_id" text NOT NULL,
+	"note_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid,
 	"content" text,
 	"lesson_id" uuid,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -236,7 +236,7 @@ CREATE TABLE "notes" (
 );
 --> statement-breakpoint
 CREATE TABLE "organisations" (
-	"organisations_id" uuid PRIMARY KEY NOT NULL,
+	"organisation_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"address" text,
 	"contact_details" text,
@@ -246,7 +246,7 @@ CREATE TABLE "organisations" (
 --> statement-breakpoint
 CREATE TABLE "organisation_users" (
 	"organisation_id" uuid,
-	"user_id" text,
+	"user_id" uuid,
 	"role_id" integer,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
@@ -262,7 +262,7 @@ CREATE TABLE "outcomes" (
 );
 --> statement-breakpoint
 CREATE TABLE "profiles" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"username" text,
 	"egl" integer,
 	"enrolled_at" text,
@@ -296,7 +296,7 @@ CREATE TABLE "quizzes" (
 );
 --> statement-breakpoint
 CREATE TABLE "quizzes_questions" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"quizzes_id" uuid,
 	"question" text,
 	"answer" text,
@@ -309,7 +309,7 @@ CREATE TABLE "quizzes_questions" (
 );
 --> statement-breakpoint
 CREATE TABLE "random_questions" (
-	"id" uuid,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"egl" integer,
 	"curriculum_reference" text[],
 	"cognitive_skill" text[],
@@ -324,7 +324,7 @@ CREATE TABLE "random_questions" (
 );
 --> statement-breakpoint
 CREATE TABLE "resources" (
-	"resource_id" uuid PRIMARY KEY NOT NULL,
+	"resource_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"resource_type" text,
 	"size" bigint NOT NULL,
 	"metadata" jsonb,
@@ -344,7 +344,7 @@ CREATE TABLE "roles" (
 );
 --> statement-breakpoint
 CREATE TABLE "sections" (
-	"section_id" uuid PRIMARY KEY NOT NULL,
+	"section_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"courses_id" uuid NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
@@ -354,16 +354,16 @@ CREATE TABLE "sections" (
 );
 --> statement-breakpoint
 CREATE TABLE "session" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"expires_at" timestamp NOT NULL,
 	"ip_address" text,
 	"user_agent" text,
-	"user_id" text NOT NULL
+	"user_id" uuid NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user_roles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
+	"user_id" uuid,
 	"role_id" serial NOT NULL,
 	"context_id" uuid NOT NULL,
 	"context_type" text NOT NULL,
@@ -373,7 +373,7 @@ CREATE TABLE "user_roles" (
 );
 --> statement-breakpoint
 CREATE TABLE "verification" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"identifier" text NOT NULL,
 	"value" text NOT NULL,
 	"expires_at" timestamp NOT NULL,
@@ -390,6 +390,16 @@ CREATE TABLE "weekly_planner" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "presence" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"last_status" text NOT NULL,
+	"last_login" timestamp with time zone,
+	"last_logout" timestamp with time zone,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "chapters" ADD CONSTRAINT "chapters_lesson_id_lessons_lesson_id_fk" FOREIGN KEY ("lesson_id") REFERENCES "public"."lessons"("lesson_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "classes_activities" ADD CONSTRAINT "classes_activities_homework_id_homework_id_fk" FOREIGN KEY ("homework_id") REFERENCES "public"."homework"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
@@ -400,7 +410,7 @@ ALTER TABLE "class_users" ADD CONSTRAINT "class_users_class_id_classes_class_id_
 ALTER TABLE "class_users" ADD CONSTRAINT "class_users_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "educations_standards_questions_mapping" ADD CONSTRAINT "educations_standards_questions_mapping_question_id_questions_id_fk" FOREIGN KEY ("question_id") REFERENCES "public"."questions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "educations_standards_questions_mapping" ADD CONSTRAINT "educations_standards_questions_mapping_standard_id_educational_standards_id_fk" FOREIGN KEY ("standard_id") REFERENCES "public"."educational_standards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "enrolments" ADD CONSTRAINT "enrolments_organisation_id_organisations_organisations_id_fk" FOREIGN KEY ("organisation_id") REFERENCES "public"."organisations"("organisations_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "enrolments" ADD CONSTRAINT "enrolments_organisation_id_organisations_organisation_id_fk" FOREIGN KEY ("organisation_id") REFERENCES "public"."organisations"("organisation_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enrolments" ADD CONSTRAINT "enrolments_course_id_courses_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "public"."courses"("courses_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enrolments" ADD CONSTRAINT "enrolments_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "groups_users" ADD CONSTRAINT "groups_users_group_id_groups_group_id_fk" FOREIGN KEY ("group_id") REFERENCES "public"."groups"("group_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -416,7 +426,7 @@ ALTER TABLE "lessons" ADD CONSTRAINT "lessons_section_id_sections_section_id_fk"
 ALTER TABLE "lessons" ADD CONSTRAINT "lessons_course_id_courses_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "public"."courses"("courses_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notes" ADD CONSTRAINT "notes_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notes" ADD CONSTRAINT "notes_lesson_id_lessons_lesson_id_fk" FOREIGN KEY ("lesson_id") REFERENCES "public"."lessons"("lesson_id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "organisation_users" ADD CONSTRAINT "organisation_users_organisation_id_organisations_organisations_id_fk" FOREIGN KEY ("organisation_id") REFERENCES "public"."organisations"("organisations_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "organisation_users" ADD CONSTRAINT "organisation_users_organisation_id_organisations_organisation_id_fk" FOREIGN KEY ("organisation_id") REFERENCES "public"."organisations"("organisation_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "organisation_users" ADD CONSTRAINT "organisation_users_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "organisation_users" ADD CONSTRAINT "organisation_users_role_id_roles_role_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("role_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "quizzes_questions" ADD CONSTRAINT "quizzes_questions_quizzes_id_quizzes_id_fk" FOREIGN KEY ("quizzes_id") REFERENCES "public"."quizzes"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -424,4 +434,6 @@ ALTER TABLE "sections" ADD CONSTRAINT "sections_courses_id_courses_courses_id_fk
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_role_id_roles_role_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("role_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "weekly_planner" ADD CONSTRAINT "weekly_planner_class_id_classes_class_id_fk" FOREIGN KEY ("class_id") REFERENCES "public"."classes"("class_id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "weekly_planner" ADD CONSTRAINT "weekly_planner_class_id_classes_class_id_fk" FOREIGN KEY ("class_id") REFERENCES "public"."classes"("class_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "presence" ADD CONSTRAINT "presence_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "user_presence_index" ON "presence" USING btree ("user_id");

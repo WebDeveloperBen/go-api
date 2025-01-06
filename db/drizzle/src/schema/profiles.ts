@@ -1,11 +1,11 @@
-import { boolean, integer, pgTable, text, uuid } from 'drizzle-orm/pg-core'
-import { timestamps } from './columns/helpers'
+import { boolean, integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { timestamps } from "./columns/helpers";
 
-export const profiles = pgTable('profiles', {
-  id: uuid().primaryKey().notNull(),
+export const profiles = pgTable("profiles", {
+  id: uuid().primaryKey().notNull().defaultRandom(),
   username: text(),
   egl: integer(),
   enrolledAt: text(),
   termsAccepted: boolean().default(false).notNull(),
   ...timestamps,
-})
+});

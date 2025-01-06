@@ -1,11 +1,8 @@
-import { integer, pgTable, text, uuid } from 'drizzle-orm/pg-core'
-import { timestamps } from './columns/helpers'
-import { sql } from 'drizzle-orm'
+import { integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { timestamps } from "./columns/helpers";
 
-export const courses = pgTable('courses', {
-  courses_id: uuid()
-    .primaryKey()
-    .$defaultFn(() => sql`uuid_generate_v4()`),
+export const courses = pgTable("courses", {
+  courses_id: uuid().primaryKey().notNull().defaultRandom(),
   name: text().notNull(),
   description: text(),
   chapters: integer(),
@@ -14,4 +11,4 @@ export const courses = pgTable('courses', {
   category: text(),
   image: text(),
   ...timestamps,
-})
+});

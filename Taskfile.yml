@@ -53,3 +53,14 @@ tasks:
     desc: Generate SQLC code from queries
     cmds:
       - rm -rf ./internal/repository/postgres && sqlc generate
+
+  generate:
+    desc: Generate both migrations and SQLC code
+    cmds:
+      - task db:gen_migrate
+      - task db:gen_query
+
+  clean:migrations:
+    desc: Generate SQLC code from queries
+    cmds:
+      - rm -rf ./db/drizzle/src/migrations

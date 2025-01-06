@@ -32,4 +32,12 @@ const db = drizzle(pool, {
   casing: "snake_case",
 });
 
-export { db, DATABASE_URL };
+const createTestMigrator = (conn: string) => {
+  const pool = new Pool({
+    connectionString: conn,
+    ssl: false, // only used for test containers
+  });
+  return drizzle(pool, { logger: true, schema, casing: "snake_case" });
+};
+
+export { db, DATABASE_URL, createTestMigrator };

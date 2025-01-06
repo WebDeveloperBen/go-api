@@ -1,10 +1,10 @@
-import { pgTable, text, uuid } from 'drizzle-orm/pg-core'
-import { timestamps } from './columns/helpers'
+import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { timestamps } from "./columns/helpers";
 
-export const groups = pgTable('groups', {
-  group_id: uuid('group_id').primaryKey(),
-  name: text('name').notNull(),
-  course_id: uuid('course_id'), //this would be the 'course', 'organisations', 'social' groups - hence no foreign key defined
-  tags: text('tags').array(),
+export const groups = pgTable("groups", {
+  groupId: uuid().primaryKey().notNull().defaultRandom(),
+  name: text().notNull(),
+  courseId: uuid(), //this would be the 'course', 'organisations', 'social' groups - hence no foreign key defined
+  tags: text().array(),
   ...timestamps,
-})
+});

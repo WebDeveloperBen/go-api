@@ -7,8 +7,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
+	"gotest.tools/assert"
+
 	"github.com/webdeveloperben/go-api/internal/lib"
-	"gotest.tools/v3/assert"
 )
 
 func TestGetUUIDParam(t *testing.T) {

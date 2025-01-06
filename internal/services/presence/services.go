@@ -1,1 +1,46 @@
 package presence
+
+import (
+	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
+	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
+)
+
+// Interface for the presence service
+type PresenceServiceInterface interface {
+	GetPresence(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error)
+	CreatePresence(ctx echo.Context, presence repository.InsertPresenceParams) error
+	UpdatePresence(ctx echo.Context, presence repository.UpdatePresenceParams) error
+	DeletePresence(ctx echo.Context, id uuid.UUID) error
+}
+
+type PresenceService struct {
+	Storage PresenceStorageInterface
+}
+
+// NewPresenceService creates a new presence service
+func NewPresenceService(storage PresenceStorageInterface) *PresenceService {
+	return &PresenceService{
+		Storage: storage,
+	}
+}
+
+// GetPresence retrieves a presence record by ID
+func (s *PresenceService) GetPresence(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error) {
+	return s.Storage.GetPresenceByID(ctx, id)
+}
+
+// CreatePresence creates a new presence record
+func (s *PresenceService) CreatePresence(ctx echo.Context, presence repository.InsertPresenceParams) error {
+	return s.Storage.InsertPresence(ctx, presence)
+}
+
+// UpdatePresence updates an existing presence record
+func (s *PresenceService) UpdatePresence(ctx echo.Context, presence repository.UpdatePresenceParams) error {
+	return s.Storage.UpdatePresence(ctx, presence)
+}
+
+// DeletePresence deletes a presence record by ID
+func (s *PresenceService) DeletePresence(ctx echo.Context, id uuid.UUID) error {
+	return s.Storage.DeletePresence(ctx, id)
+}

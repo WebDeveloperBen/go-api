@@ -5,21 +5,18 @@ import {
   text,
   unique,
   uuid,
-} from 'drizzle-orm/pg-core'
-import { timestamps } from './columns/helpers'
-import { courses } from './courses'
-import { sections } from './sections'
-import { sql } from 'drizzle-orm'
+} from "drizzle-orm/pg-core";
+import { timestamps } from "./columns/helpers";
+import { courses } from "./courses";
+import { sections } from "./sections";
 
 export const lessons = pgTable(
-  'lessons',
+  "lessons",
   {
-    lesson_id: uuid()
-      .primaryKey()
-      .$defaultFn(() => sql`uuid_generate_v4()`),
+    lesson_id: uuid().defaultRandom().primaryKey().notNull(),
     section_id: uuid()
       .notNull()
-      .references(() => sections.section_id, { onDelete: 'cascade' }),
+      .references(() => sections.section_id, { onDelete: "cascade" }),
     course_id: uuid().references(() => courses.courses_id),
     title: text().notNull(),
     summary: text(),
@@ -29,5 +26,5 @@ export const lessons = pgTable(
     image: text(),
     ...timestamps,
   },
-  (t) => [unique('unique_lesson_key').on(t.title, t.section_id, t.course_id)]
-)
+  (t) => [unique("unique_lesson_key").on(t.title, t.section_id, t.course_id)],
+);

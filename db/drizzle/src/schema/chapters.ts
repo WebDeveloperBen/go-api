@@ -5,15 +5,12 @@ import {
   pgTable,
   text,
   uuid,
-} from 'drizzle-orm/pg-core'
-import { timestamps } from './columns/helpers'
-import { lessons } from './lessons'
-import { sql } from 'drizzle-orm'
+} from "drizzle-orm/pg-core";
+import { timestamps } from "./columns/helpers";
+import { lessons } from "./lessons";
 
-export const chapters = pgTable('chapters', {
-  chapter_id: uuid()
-    .primaryKey()
-    .$defaultFn(() => sql`uuid_generate_v4()`),
+export const chapters = pgTable("chapters", {
+  id: uuid().primaryKey().notNull().defaultRandom(),
   lesson_id: uuid()
     .notNull()
     .references(() => lessons.lesson_id),
@@ -25,4 +22,4 @@ export const chapters = pgTable('chapters', {
   title: text().notNull(),
   chapter_number: integer(),
   ...timestamps,
-})
+});

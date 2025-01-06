@@ -12,10 +12,10 @@ import (
 )
 
 type Account struct {
-	ID           string      `json:"id"`
+	ID           uuid.UUID   `json:"id"`
 	AccountID    string      `json:"account_id"`
 	ProviderID   string      `json:"provider_id"`
-	UserID       string      `json:"user_id"`
+	UserID       uuid.UUID   `json:"user_id"`
 	AccessToken  pgtype.Text `json:"access_token"`
 	RefreshToken pgtype.Text `json:"refresh_token"`
 	IDToken      pgtype.Text `json:"id_token"`
@@ -47,7 +47,7 @@ type Asset struct {
 }
 
 type Chapter struct {
-	ChapterID     uuid.UUID   `json:"chapter_id"`
+	ID            uuid.UUID   `json:"id"`
 	LessonID      uuid.UUID   `json:"lesson_id"`
 	NavItemName   string      `json:"nav_item_name"`
 	Description   pgtype.Text `json:"description"`
@@ -72,14 +72,14 @@ type Class struct {
 
 type ClassScore struct {
 	ClassID uuid.UUID `json:"class_id"`
-	UserID  string    `json:"user_id"`
+	UserID  uuid.UUID `json:"user_id"`
 	Score   int32     `json:"score"`
 	Week    int32     `json:"week"`
 }
 
 type ClassUser struct {
-	ClassID uuid.UUID `json:"class_id"`
-	UserID  string    `json:"user_id"`
+	ClassID uuid.UUID  `json:"class_id"`
+	UserID  *uuid.UUID `json:"user_id"`
 }
 
 type ClassesActivity struct {
@@ -126,52 +126,52 @@ type EducationsStandardsQuestionsMapping struct {
 }
 
 type Enrolment struct {
-	OrganisationID pgtype.UUID `json:"organisation_id"`
-	CourseID       pgtype.UUID `json:"course_id"`
-	UserID         pgtype.Text `json:"user_id"`
-	Name           string      `json:"name"`
-	Tags           []string    `json:"tags"`
-	Content        []byte      `json:"content"`
-	UpdatedAt      time.Time   `json:"updated_at"`
-	CreatedAt      time.Time   `json:"created_at"`
+	OrganisationID *uuid.UUID `json:"organisation_id"`
+	CourseID       *uuid.UUID `json:"course_id"`
+	UserID         *uuid.UUID `json:"user_id"`
+	Name           string     `json:"name"`
+	Tags           []string   `json:"tags"`
+	Content        []byte     `json:"content"`
+	UpdatedAt      time.Time  `json:"updated_at"`
+	CreatedAt      time.Time  `json:"created_at"`
 }
 
 type Group struct {
-	GroupID   uuid.UUID   `json:"group_id"`
-	Name      string      `json:"name"`
-	CourseID  pgtype.UUID `json:"course_id"`
-	Tags      []string    `json:"tags"`
-	UpdatedAt time.Time   `json:"updated_at"`
-	CreatedAt time.Time   `json:"created_at"`
+	GroupID   uuid.UUID  `json:"group_id"`
+	Name      string     `json:"name"`
+	CourseID  *uuid.UUID `json:"course_id"`
+	Tags      []string   `json:"tags"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	CreatedAt time.Time  `json:"created_at"`
 }
 
 type GroupsUser struct {
-	GroupID   pgtype.UUID `json:"group_id"`
-	UserID    pgtype.Text `json:"user_id"`
-	UpdatedAt time.Time   `json:"updated_at"`
-	CreatedAt time.Time   `json:"created_at"`
+	GroupID   *uuid.UUID `json:"group_id"`
+	UserID    *uuid.UUID `json:"user_id"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	CreatedAt time.Time  `json:"created_at"`
 }
 
 type Homework struct {
-	ID        uuid.UUID   `json:"id"`
-	Name      string      `json:"name"`
-	CreatedBy pgtype.Text `json:"created_by"`
-	Tags      []string    `json:"tags"`
-	Content   []byte      `json:"content"`
-	UpdatedAt time.Time   `json:"updated_at"`
-	CreatedAt time.Time   `json:"created_at"`
+	ID        uuid.UUID  `json:"id"`
+	Name      string     `json:"name"`
+	CreatedBy *uuid.UUID `json:"created_by"`
+	Tags      []string   `json:"tags"`
+	Content   []byte     `json:"content"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	CreatedAt time.Time  `json:"created_at"`
 }
 
 type HomeworkQuestion struct {
-	ID         uuid.UUID   `json:"id"`
-	QuestionID pgtype.UUID `json:"question_id"`
-	HomeworkID pgtype.UUID `json:"homework_id"`
+	ID         uuid.UUID  `json:"id"`
+	QuestionID *uuid.UUID `json:"question_id"`
+	HomeworkID *uuid.UUID `json:"homework_id"`
 }
 
 type HomeworkSubmission struct {
 	ID         uuid.UUID   `json:"id"`
-	UserID     pgtype.Text `json:"user_id"`
-	HomeworkID pgtype.UUID `json:"homework_id"`
+	UserID     *uuid.UUID  `json:"user_id"`
+	HomeworkID *uuid.UUID  `json:"homework_id"`
 	Progress   pgtype.Int4 `json:"progress"`
 	Content    []byte      `json:"content"`
 	UpdatedAt  time.Time   `json:"updated_at"`
@@ -189,7 +189,7 @@ type Invitee struct {
 }
 
 type Jwk struct {
-	ID         string           `json:"id"`
+	ID         uuid.UUID        `json:"id"`
 	PublicKey  pgtype.Text      `json:"public_key"`
 	PrivateKey pgtype.Text      `json:"private_key"`
 	CreatedAt  pgtype.Timestamp `json:"created_at"`
@@ -198,7 +198,7 @@ type Jwk struct {
 type Lesson struct {
 	LessonID       uuid.UUID   `json:"lesson_id"`
 	SectionID      uuid.UUID   `json:"section_id"`
-	CourseID       pgtype.UUID `json:"course_id"`
+	CourseID       *uuid.UUID  `json:"course_id"`
 	Title          string      `json:"title"`
 	Summary        pgtype.Text `json:"summary"`
 	Content        []byte      `json:"content"`
@@ -225,25 +225,25 @@ type Module struct {
 
 type Note struct {
 	NoteID    uuid.UUID   `json:"note_id"`
-	UserID    string      `json:"user_id"`
+	UserID    *uuid.UUID  `json:"user_id"`
 	Content   pgtype.Text `json:"content"`
-	LessonID  pgtype.UUID `json:"lesson_id"`
+	LessonID  *uuid.UUID  `json:"lesson_id"`
 	UpdatedAt time.Time   `json:"updated_at"`
 	CreatedAt time.Time   `json:"created_at"`
 }
 
 type Organisation struct {
-	OrganisationsID uuid.UUID   `json:"organisations_id"`
-	Name            string      `json:"name"`
-	Address         pgtype.Text `json:"address"`
-	ContactDetails  pgtype.Text `json:"contact_details"`
-	UpdatedAt       time.Time   `json:"updated_at"`
-	CreatedAt       time.Time   `json:"created_at"`
+	OrganisationID uuid.UUID   `json:"organisation_id"`
+	Name           string      `json:"name"`
+	Address        pgtype.Text `json:"address"`
+	ContactDetails pgtype.Text `json:"contact_details"`
+	UpdatedAt      time.Time   `json:"updated_at"`
+	CreatedAt      time.Time   `json:"created_at"`
 }
 
 type OrganisationUser struct {
-	OrganisationID pgtype.UUID `json:"organisation_id"`
-	UserID         pgtype.Text `json:"user_id"`
+	OrganisationID *uuid.UUID  `json:"organisation_id"`
+	UserID         *uuid.UUID  `json:"user_id"`
 	RoleID         pgtype.Int4 `json:"role_id"`
 	UpdatedAt      time.Time   `json:"updated_at"`
 	CreatedAt      time.Time   `json:"created_at"`
@@ -255,6 +255,16 @@ type Outcome struct {
 	Code      string    `json:"code"`
 	UpdatedAt time.Time `json:"updated_at"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type Presence struct {
+	ID         uuid.UUID  `json:"id"`
+	UserID     uuid.UUID  `json:"user_id"`
+	LastStatus string     `json:"last_status"`
+	LastLogin  *time.Time `json:"last_login"`
+	LastLogout *time.Time `json:"last_logout"`
+	UpdatedAt  time.Time  `json:"updated_at"`
+	CreatedAt  time.Time  `json:"created_at"`
 }
 
 type Profile struct {
@@ -293,7 +303,7 @@ type Quiz struct {
 
 type QuizzesQuestion struct {
 	ID            uuid.UUID   `json:"id"`
-	QuizzesID     pgtype.UUID `json:"quizzes_id"`
+	QuizzesID     *uuid.UUID  `json:"quizzes_id"`
 	Question      pgtype.Text `json:"question"`
 	Answer        pgtype.Text `json:"answer"`
 	Options       []byte      `json:"options"`
@@ -305,7 +315,7 @@ type QuizzesQuestion struct {
 }
 
 type RandomQuestion struct {
-	ID                  pgtype.UUID `json:"id"`
+	ID                  uuid.UUID   `json:"id"`
 	Egl                 pgtype.Int4 `json:"egl"`
 	CurriculumReference []string    `json:"curriculum_reference"`
 	CognitiveSkill      []string    `json:"cognitive_skill"`
@@ -350,15 +360,15 @@ type Section struct {
 }
 
 type Session struct {
-	ID        string           `json:"id"`
+	ID        uuid.UUID        `json:"id"`
 	ExpiresAt pgtype.Timestamp `json:"expires_at"`
 	IpAddress pgtype.Text      `json:"ip_address"`
 	UserAgent pgtype.Text      `json:"user_agent"`
-	UserID    string           `json:"user_id"`
+	UserID    uuid.UUID        `json:"user_id"`
 }
 
 type User struct {
-	ID            string      `json:"id"`
+	ID            uuid.UUID   `json:"id"`
 	Fullname      string      `json:"fullname"`
 	Email         string      `json:"email"`
 	EmailVerified pgtype.Bool `json:"email_verified"`
@@ -368,17 +378,17 @@ type User struct {
 }
 
 type UserRole struct {
-	ID          uuid.UUID `json:"id"`
-	UserID      string    `json:"user_id"`
-	RoleID      int32     `json:"role_id"`
-	ContextID   uuid.UUID `json:"context_id"`
-	ContextType string    `json:"context_type"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          uuid.UUID  `json:"id"`
+	UserID      *uuid.UUID `json:"user_id"`
+	RoleID      int32      `json:"role_id"`
+	ContextID   uuid.UUID  `json:"context_id"`
+	ContextType string     `json:"context_type"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	CreatedAt   time.Time  `json:"created_at"`
 }
 
 type Verification struct {
-	ID         string           `json:"id"`
+	ID         uuid.UUID        `json:"id"`
 	Identifier string           `json:"identifier"`
 	Value      string           `json:"value"`
 	ExpiresAt  pgtype.Timestamp `json:"expires_at"`

@@ -1,7 +1,7 @@
-import { integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
+import { integer, jsonb, pgTable, text, uuid } from "drizzle-orm/pg-core";
 
-export const random_questions = pgTable('random_questions', {
-  id: uuid(),
+export const random_questions = pgTable("random_questions", {
+  id: uuid().primaryKey().notNull().defaultRandom(),
   egl: integer(),
   curriculum_reference: text().array(),
   cognitive_skill: text().array(),
@@ -13,4 +13,4 @@ export const random_questions = pgTable('random_questions', {
   answer: text(),
   options: jsonb(),
   type: text(),
-})
+});
