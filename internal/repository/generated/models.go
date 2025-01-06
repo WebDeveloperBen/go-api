@@ -368,13 +368,13 @@ type Session struct {
 }
 
 type User struct {
-	ID            uuid.UUID   `json:"id"`
-	Fullname      string      `json:"fullname"`
-	Email         string      `json:"email"`
-	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         string      `json:"image"`
-	UpdatedAt     time.Time   `json:"updated_at"`
-	CreatedAt     time.Time   `json:"created_at"`
+	ID            uuid.UUID `json:"id"`
+	Fullname      string    `json:"fullname"`
+	Email         string    `json:"email"`
+	EmailVerified bool      `json:"email_verified"`
+	Image         string    `json:"image"`
+	UpdatedAt     time.Time `json:"updated_at"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 type UserRole struct {

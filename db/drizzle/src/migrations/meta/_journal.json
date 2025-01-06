@@ -22,6 +22,13 @@
       "when": 1736174346917,
       "tag": "0002_tranquil_professor_monster",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1736201404136,
+      "tag": "0003_nervous_jackpot",
+      "breakpoints": true
     }
   ]
 }

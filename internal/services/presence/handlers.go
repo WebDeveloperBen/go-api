@@ -38,7 +38,7 @@ func (h *PresenceHandler) HandleGetPresences(c echo.Context) error {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, presence)
+	return lib.WriteJSON(c, http.StatusOK, presence)
 }
 
 // Get presence by ID
@@ -58,21 +58,38 @@ func (h *PresenceHandler) HandleGetPresence(c echo.Context) error {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, presence)
+	return lib.WriteJSON(c, http.StatusOK, presence)
 }
 
 // Create a new presence record
+
 func (h *PresenceHandler) HandleCreatePresence(c echo.Context) error {
-	var presence repository.InsertPresenceParams
-	if err := c.Bind(&presence); err != nil {
+	var req CreatePresenceRequest
+	if err := c.Bind(&req); err != nil {
+		return lib.InvalidJSON(c)
+	}
+
+	if err := lib.ValidateRequest(h.Validator, req); err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	if err := h.Service.CreatePresence(c, presence); err != nil {
-		return lib.WriteError(c, http.StatusInternalServerError, err)
+	parsedUUID, err := lib.ParseUUID(req.UserID)
+	if err != nil {
+		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	return c.JSON(http.StatusCreated, presence)
+	presence := repository.InsertPresenceParams{
+		LastStatus: req.LastStatus,
+		UserID:     parsedUUID,
+		LastLogin:  req.LastLogin,
+		LastLogout: req.LastLogout,
+	}
+
+	err = h.Service.CreatePresence(c, presence)
+	if err != nil {
+		return lib.WriteError(c, http.StatusInternalServerError, err)
+	}
+	return lib.WriteJSON(c, http.StatusCreated, req)
 }
 
 // Update presence record
@@ -86,7 +103,7 @@ func (h *PresenceHandler) HandleUpdatePresence(c echo.Context) error {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, presence)
+	return lib.WriteJSON(c, http.StatusOK, presence)
 }
 
 // Delete presence record

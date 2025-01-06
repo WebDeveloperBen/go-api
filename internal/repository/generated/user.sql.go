@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createUser = `-- name: CreateUser :exec
@@ -19,10 +18,10 @@ VALUES ($1, $2, $3, $4, now(), now())
 `
 
 type CreateUserParams struct {
-	Fullname      string      `json:"fullname"`
-	Email         string      `json:"email"`
-	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         string      `json:"image"`
+	Fullname      string `json:"fullname"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+	Image         string `json:"image"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
@@ -55,13 +54,13 @@ ORDER BY created_at DESC
 `
 
 type GetAllUsersRow struct {
-	ID            uuid.UUID   `json:"id"`
-	Fullname      string      `json:"fullname"`
-	Email         string      `json:"email"`
-	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         string      `json:"image"`
-	CreatedAt     time.Time   `json:"created_at"`
-	UpdatedAt     time.Time   `json:"updated_at"`
+	ID            uuid.UUID `json:"id"`
+	Fullname      string    `json:"fullname"`
+	Email         string    `json:"email"`
+	EmailVerified bool      `json:"email_verified"`
+	Image         string    `json:"image"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 func (q *Queries) GetAllUsers(ctx context.Context) ([]GetAllUsersRow, error) {
@@ -99,13 +98,13 @@ WHERE id = $1
 `
 
 type GetUserRow struct {
-	ID            uuid.UUID   `json:"id"`
-	Fullname      string      `json:"fullname"`
-	Email         string      `json:"email"`
-	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         string      `json:"image"`
-	CreatedAt     time.Time   `json:"created_at"`
-	UpdatedAt     time.Time   `json:"updated_at"`
+	ID            uuid.UUID `json:"id"`
+	Fullname      string    `json:"fullname"`
+	Email         string    `json:"email"`
+	EmailVerified bool      `json:"email_verified"`
+	Image         string    `json:"image"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (GetUserRow, error) {
@@ -130,11 +129,11 @@ WHERE id = $1
 `
 
 type UpdateUserParams struct {
-	ID            uuid.UUID   `json:"id"`
-	Fullname      string      `json:"fullname"`
-	Email         string      `json:"email"`
-	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         string      `json:"image"`
+	ID            uuid.UUID `json:"id"`
+	Fullname      string    `json:"fullname"`
+	Email         string    `json:"email"`
+	EmailVerified bool      `json:"email_verified"`
+	Image         string    `json:"image"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {

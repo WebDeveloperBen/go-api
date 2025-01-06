@@ -7,18 +7,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/webdeveloperben/go-api/internal/lib"
 	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
 	"github.com/webdeveloperben/go-api/internal/services/presence"
 	"github.com/webdeveloperben/go-api/internal/testutils"
 )
 
-func InsertTestUser(queries *repository.Queries, userID string) error {
-	err := queries.CreateUser(context.Background(), repository.CreateUserParams{
-		Fullname:      "test_user",
-		Email:         "test@user.com",
-		EmailVerified: true,
-		Image:         "",
-	})
+func InsertTestUser(deps *lib.AppDependencies, userID string) error {
+	_, err := deps.DB.Exec(context.Background(), `
+		INSERT INTO users (id, fullname, email)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (id) DO NOTHING;
+	`, userID, "Test User", "testuser@example.com")
 	return err
 }
 
@@ -32,6 +32,10 @@ func TestPresenceHandler(t *testing.T) {
 	presenceService := presence.NewPresenceService(presenceStorage)
 	presenceHandler := presence.NewPresenceHandler(presenceService, deps.Validator)
 	presence.NewPresenceRouter(api, presenceHandler)
+
+	/**
+	 * Seed the service
+	 */
 	userID := "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 	require.NoError(t, InsertTestUser(deps, userID))
 
@@ -70,7 +74,7 @@ func TestPresenceHandler(t *testing.T) {
 				"last_status": "offline",
 			},
 			expectedStatus: http.StatusBadRequest,
-			expectedBody:   `"user_id":"required"`, // Validation error message
+			expectedBody:   `"user_id":"user_id is a required field"`,
 		},
 	}
 

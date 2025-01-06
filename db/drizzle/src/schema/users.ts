@@ -5,7 +5,7 @@ export const users = pgTable("users", {
   id: uuid().primaryKey().notNull().defaultRandom(),
   fullname: text().notNull(),
   email: text().notNull().unique(),
-  emailVerified: boolean().default(false),
+  emailVerified: boolean().notNull().default(false),
   image: text(),
   ...timestamps,
 });

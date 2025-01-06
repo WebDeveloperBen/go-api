@@ -23,3 +23,8 @@ func GetUUIDParam(c echo.Context, param string) (uuid.UUID, error) {
 
 	return parsedUUID, nil
 }
+
+// IsValidUUID converts a string to a uuid.UUID and returns an error if invalid.
+func ParseUUID(id string) (uuid.UUID, error) {
+	return uuid.Parse(id)
+}

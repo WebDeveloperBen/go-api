@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -29,6 +30,16 @@ type ValidatorErrorResponse struct {
 func NewValidatorService(v *validator.Validate) (*ValidatorService, error) {
 	v.RegisterValidation("uuid", func(fl validator.FieldLevel) bool {
 		return IsValidUUID(fl.Field().String())
+	})
+
+	// Configure the validator to use the `json` tag
+	v.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		// Use the `json` tag if available
+		name := fld.Tag.Get("json")
+		if name == "" || name == "-" {
+			return fld.Name // Fallback to the struct field name
+		}
+		return name
 	})
 
 	// Setup translator
