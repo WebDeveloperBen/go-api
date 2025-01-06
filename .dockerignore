@@ -1,0 +1,11 @@
+./testutils
+./db
+Taskfile.yml
+compose.yml
+mise.toml
+air.toml
+.env
+.env.example
+README.md
+.git
+.github/**/*
