@@ -1,4 +1,3 @@
-
 -- name: GetUser :one
 SELECT id, fullname, email, email_verified, image, created_at, updated_at 
 FROM users 

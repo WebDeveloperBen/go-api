@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./"]
+    },
+    "incremental": true,
+    "pretty": true,
+    "diagnostics": true,
+    "removeComments": true,
+    "noImplicitAny": false,
+    "disableSizeLimit": true,
+    "stripInternal": true,
+    "importHelpers": true,
+    "noUnusedParameters": false,
+    "strictNullChecks": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipDefaultLibCheck": true
+  },
+  "tsc-alias": { "resolveFullPaths": true },
+  "exclude": ["node_modules", "dist", "./src/db/migrations"]
+}

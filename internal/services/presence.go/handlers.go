@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/webdeveloperben/ise-go-api/internal/lib"
-	repository "github.com/webdeveloperben/ise-go-api/internal/repository/postgres"
+	"github.com/webdeveloperben/go-api/internal/lib"
+	repository "github.com/webdeveloperben/go-api/internal/repository/postgres"
 )
 
 // Interface for the presence handler

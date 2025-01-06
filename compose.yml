@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:15
-    container_name: postgres-local
+    container_name: postgres-go-api
     ports:
       - "5432:5432"
     environment:
@@ -9,9 +9,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: my_database
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - api_postgres_data:/var/lib/postgresql/data
       # Mount your setup script to the initdb directory
-      - ./setup.sql:/docker-entrypoint-initdb.d/setup.sql:ro
+      - ./db/setup.sql:/docker-entrypoint-initdb.d/setup.sql:ro
 
 volumes:
-  postgres_data:
+  api_postgres_data:
