@@ -8,6 +8,7 @@ import (
 
 // Interface for the presence service
 type PresenceServiceInterface interface {
+	GetPresences(ctx echo.Context) ([]repository.GetAllPresenceRow, error)
 	GetPresence(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error)
 	CreatePresence(ctx echo.Context, presence repository.InsertPresenceParams) error
 	UpdatePresence(ctx echo.Context, presence repository.UpdatePresenceParams) error
@@ -23,6 +24,11 @@ func NewPresenceService(storage PresenceStorageInterface) *PresenceService {
 	return &PresenceService{
 		Storage: storage,
 	}
+}
+
+// GetPresences retrieves all presences
+func (s *PresenceService) GetPresences(ctx echo.Context) ([]repository.GetAllPresenceRow, error) {
+	return s.Storage.GetAllPresence(ctx)
 }
 
 // GetPresence retrieves a presence record by ID

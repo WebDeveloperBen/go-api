@@ -3,13 +3,11 @@ package lib
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/rs/zerolog"
 
 	"github.com/webdeveloperben/go-api/internal/config"
 )
@@ -17,12 +15,12 @@ import (
 type AppDependencies struct {
 	Validator *ValidatorService
 	DB        *pgxpool.Pool
-	Logger    zerolog.Logger
 }
 
 func CreateApi(ctx context.Context, cfg config.Config) (*echo.Echo, *AppDependencies, error) {
 	// Initialize logger
-	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
+	isProd := config.Envs.IsProd
+	logger := NewLogger(isProd)
 
 	// Validate configuration
 	if cfg.DBConnString == "" {
@@ -46,16 +44,7 @@ func CreateApi(ctx context.Context, cfg config.Config) (*echo.Echo, *AppDependen
 	// Middleware
 	app.Use(middleware.Recover())
 	app.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogURI:    true,
-		LogStatus: true,
-		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			logger.Info().
-				Str("method", c.Request().Method).
-				Str("URI", v.URI).
-				Int("status", v.Status).
-				Msg("request processed")
-			return nil
-		},
+		LogValuesFunc: CustomLogFunc,
 	}))
 
 	// Use CORS in production
@@ -80,6 +69,5 @@ func CreateApi(ctx context.Context, cfg config.Config) (*echo.Echo, *AppDependen
 	return app, &AppDependencies{
 		Validator: validatorSvc,
 		DB:        conn,
-		Logger:    logger,
 	}, nil
 }

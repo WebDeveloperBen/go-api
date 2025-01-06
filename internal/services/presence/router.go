@@ -19,7 +19,7 @@ func NewPresenceRouter(group *echo.Group, handler *PresenceHandler) {
 
 // NOTE: Don't use trailing slashes on routes with Echo
 func (r *Router) AttachRoutes() {
-	r.Group.GET("/presence", r.Handler.HandleGetPresence)
+	r.Group.GET("/presence", r.Handler.HandleGetPresences)
 	r.Group.GET("/presence/:id", r.Handler.HandleGetPresence)
 	r.Group.POST("/presence", r.Handler.HandleCreatePresence)
 	r.Group.PATCH("/presence/:id", r.Handler.HandleUpdatePresence)

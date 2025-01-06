@@ -11,53 +11,69 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// MyLogger wraps zerolog.Logger for custom behavior
 type MyLogger struct {
 	zerolog.Logger
 }
 
-// global variable for easy access everywhere
+// Global logger instance
 var Logger MyLogger
 
-// create a new global logger
-func NewLogger() MyLogger {
-	// create output configuration
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+// NewLogger initializes and returns a global logger
+func NewLogger(isProd bool) MyLogger {
+	var output zerolog.ConsoleWriter
 
-	// Format level: fatal, error, debug, info, warn
-	output.FormatLevel = func(i interface{}) string {
-		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
-	}
-	output.FormatMessage = func(i interface{}) string {
-		return fmt.Sprintf("***%s****", i)
-	}
-	output.FormatFieldName = func(i interface{}) string {
-		return fmt.Sprintf("%s:", i)
-	}
-	output.FormatFieldValue = func(i interface{}) string {
-		return fmt.Sprintf("%s", i)
+	if isProd {
+		// JSON output for production
+		output = zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+	} else {
+		// Console output for development
+		output = zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+		output.FormatLevel = func(i interface{}) string {
+			return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
+		}
+		output.FormatMessage = func(i interface{}) string {
+			return fmt.Sprintf("*** %s ***", i)
+		}
+		output.FormatFieldName = func(i interface{}) string {
+			return fmt.Sprintf("%s:", i)
+		}
+		output.FormatFieldValue = func(i interface{}) string {
+			return fmt.Sprintf("%s", i)
+		}
+		output.FormatErrFieldName = func(i interface{}) string {
+			return fmt.Sprintf("%s: ", i)
+		}
 	}
 
-	// format error
-	output.FormatErrFieldName = func(i interface{}) string {
-		return fmt.Sprintf("%s: ", i)
-	}
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	logger := zerolog.New(output).With().Timestamp().Logger()
 
-	zerolog := zerolog.New(output).With().Caller().Timestamp().Logger()
-	Logger = MyLogger{zerolog}
+	Logger = MyLogger{logger}
 	return Logger
 }
 
-// this is the custom logger for the echo logger middleware
+// CustomLogFunc is the logging function for Echo middleware
 func CustomLogFunc(c echo.Context, v middleware.RequestLoggerValues) error {
 	Logger.Info().
+		Str("path", c.Request().URL.Path).
+		Str("method", c.Request().Method).
 		Int("status", v.Status).
-		Str("method", v.Method).
-		Str("uri", v.URI).
 		Str("remote_ip", v.RemoteIP).
 		Str("user_agent", v.UserAgent).
 		Dur("latency", v.Latency).
-		Err(v.Error).
-		Msg("request completed")
+		Str("request_id", c.Response().Header().Get(echo.HeaderXRequestID)).
+		Msg("request processed")
 
 	return nil
+}
+
+// LogError is a helper function for structured error logging
+func LogError(c echo.Context, err error, msg string) {
+	Logger.Error().
+		Str("path", c.Request().URL.Path).
+		Str("method", c.Request().Method).
+		Str("request_id", c.Response().Header().Get(echo.HeaderXRequestID)).
+		Err(err).
+		Msg(msg)
 }

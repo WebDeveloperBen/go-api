@@ -49,9 +49,7 @@ func loadConfig() Config {
 	}
 	return Config{
 		AppPort:             getEnv("PORT", "3000"),
-		DBConnString:        getEnv("CONN_STRING", "mongodb://root:example@localhost:27017"),
-		DBName:              getEnv("DB_NAME", "test"),
-		DBType:              strings.ToLower(getEnv("DB_TYPE", "mongo")),
+		DBConnString:        getEnv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/my_database?sslmode=disable"),
 		StorageBackendType:  strings.ToLower(getEnv("STORAGE_BACKEND_TYPE", "s3")),
 		AwsS3BucketName:     getEnv("AWS_S3_BUCKET_NAME", "testBucket"),
 		AwsS3Region:         getEnv("AWS_S3_REGION", "ap-southeast-2"),

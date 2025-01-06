@@ -22,7 +22,7 @@ type CreateUserParams struct {
 	Fullname      string      `json:"fullname"`
 	Email         string      `json:"email"`
 	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         pgtype.Text `json:"image"`
+	Image         string      `json:"image"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
@@ -59,7 +59,7 @@ type GetAllUsersRow struct {
 	Fullname      string      `json:"fullname"`
 	Email         string      `json:"email"`
 	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         pgtype.Text `json:"image"`
+	Image         string      `json:"image"`
 	CreatedAt     time.Time   `json:"created_at"`
 	UpdatedAt     time.Time   `json:"updated_at"`
 }
@@ -103,7 +103,7 @@ type GetUserRow struct {
 	Fullname      string      `json:"fullname"`
 	Email         string      `json:"email"`
 	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         pgtype.Text `json:"image"`
+	Image         string      `json:"image"`
 	CreatedAt     time.Time   `json:"created_at"`
 	UpdatedAt     time.Time   `json:"updated_at"`
 }
@@ -134,7 +134,7 @@ type UpdateUserParams struct {
 	Fullname      string      `json:"fullname"`
 	Email         string      `json:"email"`
 	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         pgtype.Text `json:"image"`
+	Image         string      `json:"image"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {

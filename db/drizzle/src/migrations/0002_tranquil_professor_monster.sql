@@ -1,0 +1,1 @@
+ALTER TABLE "presence" ADD CONSTRAINT "presence_user_id_unique" UNIQUE("user_id");

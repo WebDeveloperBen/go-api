@@ -12,45 +12,45 @@ import (
 )
 
 type Account struct {
-	ID           uuid.UUID   `json:"id"`
-	AccountID    string      `json:"account_id"`
-	ProviderID   string      `json:"provider_id"`
-	UserID       uuid.UUID   `json:"user_id"`
-	AccessToken  pgtype.Text `json:"access_token"`
-	RefreshToken pgtype.Text `json:"refresh_token"`
-	IDToken      pgtype.Text `json:"id_token"`
-	ExpiresAt    *time.Time  `json:"expires_at"`
-	Password     pgtype.Text `json:"password"`
+	ID           uuid.UUID  `json:"id"`
+	AccountID    string     `json:"account_id"`
+	ProviderID   string     `json:"provider_id"`
+	UserID       uuid.UUID  `json:"user_id"`
+	AccessToken  string     `json:"access_token"`
+	RefreshToken string     `json:"refresh_token"`
+	IDToken      string     `json:"id_token"`
+	ExpiresAt    *time.Time `json:"expires_at"`
+	Password     string     `json:"password"`
 }
 
 type ActivityType struct {
-	ID        uuid.UUID   `json:"id"`
-	Name      string      `json:"name"`
-	Published bool        `json:"published"`
-	Category  pgtype.Text `json:"category"`
-	CardColor pgtype.Text `json:"card_color"`
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	Published bool      `json:"published"`
+	Category  string    `json:"category"`
+	CardColor string    `json:"card_color"`
 }
 
 type Asset struct {
-	ID            uuid.UUID   `json:"id"`
-	FileName      string      `json:"file_name"`
-	ContentType   string      `json:"content_type"`
-	ETag          pgtype.Text `json:"e_tag"`
-	ContainerName string      `json:"container_name"`
-	Uri           string      `json:"uri"`
-	Size          int32       `json:"size"`
-	Metadata      []byte      `json:"metadata"`
-	IsPublic      bool        `json:"is_public"`
-	Published     bool        `json:"published"`
-	UpdatedAt     time.Time   `json:"updated_at"`
-	CreatedAt     time.Time   `json:"created_at"`
+	ID            uuid.UUID `json:"id"`
+	FileName      string    `json:"file_name"`
+	ContentType   string    `json:"content_type"`
+	ETag          string    `json:"e_tag"`
+	ContainerName string    `json:"container_name"`
+	Uri           string    `json:"uri"`
+	Size          int32     `json:"size"`
+	Metadata      []byte    `json:"metadata"`
+	IsPublic      bool      `json:"is_public"`
+	Published     bool      `json:"published"`
+	UpdatedAt     time.Time `json:"updated_at"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 type Chapter struct {
 	ID            uuid.UUID   `json:"id"`
 	LessonID      uuid.UUID   `json:"lesson_id"`
 	NavItemName   string      `json:"nav_item_name"`
-	Description   pgtype.Text `json:"description"`
+	Description   string      `json:"description"`
 	Order         pgtype.Int4 `json:"order"`
 	Content       []byte      `json:"content"`
 	Published     bool        `json:"published"`
@@ -63,7 +63,7 @@ type Chapter struct {
 type Class struct {
 	ClassID     uuid.UUID   `json:"class_id"`
 	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
+	Description string      `json:"description"`
 	CourseCode  string      `json:"course_code"`
 	Duration    pgtype.Int4 `json:"duration"`
 	UpdatedAt   time.Time   `json:"updated_at"`
@@ -83,27 +83,27 @@ type ClassUser struct {
 }
 
 type ClassesActivity struct {
-	ID         uuid.UUID   `json:"id"`
-	Term       pgtype.Text `json:"term"`
-	StartDate  *time.Time  `json:"start_date"`
-	EndDate    *time.Time  `json:"end_date"`
-	HomeworkID uuid.UUID   `json:"homework_id"`
-	Day        pgtype.Text `json:"day"`
-	Period     pgtype.Text `json:"period"`
-	ClassID    uuid.UUID   `json:"class_id"`
-	UpdatedAt  time.Time   `json:"updated_at"`
-	CreatedAt  time.Time   `json:"created_at"`
+	ID         uuid.UUID  `json:"id"`
+	Term       string     `json:"term"`
+	StartDate  *time.Time `json:"start_date"`
+	EndDate    *time.Time `json:"end_date"`
+	HomeworkID uuid.UUID  `json:"homework_id"`
+	Day        string     `json:"day"`
+	Period     string     `json:"period"`
+	ClassID    uuid.UUID  `json:"class_id"`
+	UpdatedAt  time.Time  `json:"updated_at"`
+	CreatedAt  time.Time  `json:"created_at"`
 }
 
 type Course struct {
 	CoursesID   uuid.UUID   `json:"courses_id"`
 	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
+	Description string      `json:"description"`
 	Chapters    pgtype.Int4 `json:"chapters"`
 	Sections    pgtype.Int4 `json:"sections"`
 	Duration    pgtype.Int4 `json:"duration"`
-	Category    pgtype.Text `json:"category"`
-	Image       pgtype.Text `json:"image"`
+	Category    string      `json:"category"`
+	Image       string      `json:"image"`
 	UpdatedAt   time.Time   `json:"updated_at"`
 	CreatedAt   time.Time   `json:"created_at"`
 }
@@ -179,19 +179,19 @@ type HomeworkSubmission struct {
 }
 
 type Invitee struct {
-	ID        uuid.UUID   `json:"id"`
-	Email     string      `json:"email"`
-	Name      pgtype.Text `json:"name"`
-	InvitedBy string      `json:"invited_by"`
-	Relation  pgtype.Text `json:"relation"`
-	UpdatedAt time.Time   `json:"updated_at"`
-	CreatedAt time.Time   `json:"created_at"`
+	ID        uuid.UUID `json:"id"`
+	Email     string    `json:"email"`
+	Name      string    `json:"name"`
+	InvitedBy string    `json:"invited_by"`
+	Relation  string    `json:"relation"`
+	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Jwk struct {
 	ID         uuid.UUID        `json:"id"`
-	PublicKey  pgtype.Text      `json:"public_key"`
-	PrivateKey pgtype.Text      `json:"private_key"`
+	PublicKey  string           `json:"public_key"`
+	PrivateKey string           `json:"private_key"`
 	CreatedAt  pgtype.Timestamp `json:"created_at"`
 }
 
@@ -200,11 +200,11 @@ type Lesson struct {
 	SectionID      uuid.UUID   `json:"section_id"`
 	CourseID       *uuid.UUID  `json:"course_id"`
 	Title          string      `json:"title"`
-	Summary        pgtype.Text `json:"summary"`
+	Summary        string      `json:"summary"`
 	Content        []byte      `json:"content"`
 	Duration       pgtype.Int4 `json:"duration"`
 	OrderInSubject pgtype.Int4 `json:"order_in_subject"`
-	Image          pgtype.Text `json:"image"`
+	Image          string      `json:"image"`
 	UpdatedAt      time.Time   `json:"updated_at"`
 	CreatedAt      time.Time   `json:"created_at"`
 }
@@ -215,30 +215,30 @@ type LessonResource struct {
 }
 
 type Module struct {
-	ID          int64       `json:"id"`
-	Title       pgtype.Text `json:"title"`
-	Description pgtype.Text `json:"description"`
-	Asset       pgtype.Text `json:"asset"`
-	UpdatedAt   time.Time   `json:"updated_at"`
-	CreatedAt   time.Time   `json:"created_at"`
+	ID          int64     `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Asset       string    `json:"asset"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Note struct {
-	NoteID    uuid.UUID   `json:"note_id"`
-	UserID    *uuid.UUID  `json:"user_id"`
-	Content   pgtype.Text `json:"content"`
-	LessonID  *uuid.UUID  `json:"lesson_id"`
-	UpdatedAt time.Time   `json:"updated_at"`
-	CreatedAt time.Time   `json:"created_at"`
+	NoteID    uuid.UUID  `json:"note_id"`
+	UserID    *uuid.UUID `json:"user_id"`
+	Content   string     `json:"content"`
+	LessonID  *uuid.UUID `json:"lesson_id"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	CreatedAt time.Time  `json:"created_at"`
 }
 
 type Organisation struct {
-	OrganisationID uuid.UUID   `json:"organisation_id"`
-	Name           string      `json:"name"`
-	Address        pgtype.Text `json:"address"`
-	ContactDetails pgtype.Text `json:"contact_details"`
-	UpdatedAt      time.Time   `json:"updated_at"`
-	CreatedAt      time.Time   `json:"created_at"`
+	OrganisationID uuid.UUID `json:"organisation_id"`
+	Name           string    `json:"name"`
+	Address        string    `json:"address"`
+	ContactDetails string    `json:"contact_details"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	CreatedAt      time.Time `json:"created_at"`
 }
 
 type OrganisationUser struct {
@@ -269,9 +269,9 @@ type Presence struct {
 
 type Profile struct {
 	ID            uuid.UUID   `json:"id"`
-	Username      pgtype.Text `json:"username"`
+	Username      string      `json:"username"`
 	Egl           pgtype.Int4 `json:"egl"`
-	EnrolledAt    pgtype.Text `json:"enrolled_at"`
+	EnrolledAt    string      `json:"enrolled_at"`
 	TermsAccepted bool        `json:"terms_accepted"`
 	UpdatedAt     time.Time   `json:"updated_at"`
 	CreatedAt     time.Time   `json:"created_at"`
@@ -285,16 +285,16 @@ type Question struct {
 	ReadingAbility      pgtype.Int4 `json:"reading_ability"`
 	WritingAbility      pgtype.Int4 `json:"writing_ability"`
 	ListeningAbility    pgtype.Int4 `json:"listening_ability"`
-	Title               pgtype.Text `json:"title"`
-	Question            pgtype.Text `json:"question"`
-	Answer              pgtype.Text `json:"answer"`
+	Title               string      `json:"title"`
+	Question            string      `json:"question"`
+	Answer              string      `json:"answer"`
 	Options             []byte      `json:"options"`
-	Type                pgtype.Text `json:"type"`
+	Type                string      `json:"type"`
 }
 
 type Quiz struct {
-	Title          pgtype.Text `json:"title"`
-	Description    pgtype.Text `json:"description"`
+	Title          string      `json:"title"`
+	Description    string      `json:"description"`
 	ID             uuid.UUID   `json:"id"`
 	TotalQuestions pgtype.Int4 `json:"total_questions"`
 	UpdatedAt      time.Time   `json:"updated_at"`
@@ -304,10 +304,10 @@ type Quiz struct {
 type QuizzesQuestion struct {
 	ID            uuid.UUID   `json:"id"`
 	QuizzesID     *uuid.UUID  `json:"quizzes_id"`
-	Question      pgtype.Text `json:"question"`
-	Answer        pgtype.Text `json:"answer"`
+	Question      string      `json:"question"`
+	Answer        string      `json:"answer"`
 	Options       []byte      `json:"options"`
-	Type          pgtype.Text `json:"type"`
+	Type          string      `json:"type"`
 	QuestionOrder pgtype.Int4 `json:"question_order"`
 	Resources     [][]byte    `json:"resources"`
 	UpdatedAt     time.Time   `json:"updated_at"`
@@ -322,38 +322,38 @@ type RandomQuestion struct {
 	ReadingAbility      pgtype.Int4 `json:"reading_ability"`
 	WritingAbility      pgtype.Int4 `json:"writing_ability"`
 	ListeningAbility    pgtype.Int4 `json:"listening_ability"`
-	Title               pgtype.Text `json:"title"`
-	Question            pgtype.Text `json:"question"`
-	Answer              pgtype.Text `json:"answer"`
+	Title               string      `json:"title"`
+	Question            string      `json:"question"`
+	Answer              string      `json:"answer"`
 	Options             []byte      `json:"options"`
-	Type                pgtype.Text `json:"type"`
+	Type                string      `json:"type"`
 }
 
 type Resource struct {
-	ResourceID   uuid.UUID   `json:"resource_id"`
-	ResourceType pgtype.Text `json:"resource_type"`
-	Size         int64       `json:"size"`
-	Metadata     []byte      `json:"metadata"`
-	Etag         pgtype.Text `json:"etag"`
-	Provider     string      `json:"provider"`
-	Uri          pgtype.Text `json:"uri"`
-	UpdatedAt    time.Time   `json:"updated_at"`
-	CreatedAt    time.Time   `json:"created_at"`
+	ResourceID   uuid.UUID `json:"resource_id"`
+	ResourceType string    `json:"resource_type"`
+	Size         int64     `json:"size"`
+	Metadata     []byte    `json:"metadata"`
+	Etag         string    `json:"etag"`
+	Provider     string    `json:"provider"`
+	Uri          string    `json:"uri"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 type Role struct {
-	RoleID      int32       `json:"role_id"`
-	Name        pgtype.Text `json:"name"`
-	Description pgtype.Text `json:"description"`
-	UpdatedAt   time.Time   `json:"updated_at"`
-	CreatedAt   time.Time   `json:"created_at"`
+	RoleID      int32     `json:"role_id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Section struct {
 	SectionID   uuid.UUID   `json:"section_id"`
 	CoursesID   uuid.UUID   `json:"courses_id"`
 	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
+	Description string      `json:"description"`
 	Order       pgtype.Int4 `json:"order"`
 	UpdatedAt   time.Time   `json:"updated_at"`
 	CreatedAt   time.Time   `json:"created_at"`
@@ -362,8 +362,8 @@ type Section struct {
 type Session struct {
 	ID        uuid.UUID        `json:"id"`
 	ExpiresAt pgtype.Timestamp `json:"expires_at"`
-	IpAddress pgtype.Text      `json:"ip_address"`
-	UserAgent pgtype.Text      `json:"user_agent"`
+	IpAddress string           `json:"ip_address"`
+	UserAgent string           `json:"user_agent"`
 	UserID    uuid.UUID        `json:"user_id"`
 }
 
@@ -372,7 +372,7 @@ type User struct {
 	Fullname      string      `json:"fullname"`
 	Email         string      `json:"email"`
 	EmailVerified pgtype.Bool `json:"email_verified"`
-	Image         pgtype.Text `json:"image"`
+	Image         string      `json:"image"`
 	UpdatedAt     time.Time   `json:"updated_at"`
 	CreatedAt     time.Time   `json:"created_at"`
 }

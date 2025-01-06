@@ -77,7 +77,6 @@ func WriteError(c echo.Context, status int, err error) error {
 		// Handle PublicError, which includes BaseError
 		logMessage = e.PrivateMessage()
 		publicErrors = append(publicErrors, e.PublicMessage())
-
 	case *echo.HTTPError:
 		// Handle Echo-specific HTTP errors
 		if errResponse, ok := e.Message.(ErrorResponse); ok {
@@ -86,20 +85,19 @@ func WriteError(c echo.Context, status int, err error) error {
 			publicErrors = append(publicErrors, e.Message)
 		}
 		logMessage = fmt.Sprintf("%v", e.Message)
-
 	default:
 		// Generic fallback for other error types
 		logMessage = err.Error()
 		publicErrors = append(publicErrors, "an unexpected error occurred")
 	}
 
-	// Log the error details for debugging
+	// Log the detailed private error message
 	Logger.Error().
 		Timestamp().
 		Str("path", c.Request().URL.Path).
 		Str("method", c.Request().Method).
 		Str("request_id", requestID).
-		Str("error", logMessage).
+		Str("error", logMessage). // Log private error details
 		Msg("an error occurred")
 
 	// Return the sanitized error response to the client

@@ -25,7 +25,7 @@ import path from "path";
 
     // Set up Drizzle ORM
     const db = drizzle(pool, {
-      logger: true,
+      logger: false,
       casing: "snake_case",
     });
 

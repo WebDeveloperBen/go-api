@@ -1,6 +1,6 @@
 {
-  "id": "6f1312a2-8619-4741-aa02-03ea0ab71d9d",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "24670344-976f-44dd-b8da-a9f5e22a0e27",
+  "prevId": "6f1312a2-8619-4741-aa02-03ea0ab71d9d",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -2798,23 +2798,7 @@
           "default": "now()"
         }
       },
-      "indexes": {
-        "user_presence_index": {
-          "name": "user_presence_index",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "presence_user_id_users_id_fk": {
           "name": "presence_user_id_users_id_fk",

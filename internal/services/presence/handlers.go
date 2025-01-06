@@ -10,6 +10,7 @@ import (
 
 // Interface for the presence handler
 type PresenceHandlerInterface interface {
+	HandleGetPresences(c echo.Context) error
 	HandleGetPresence(c echo.Context) error
 	HandleCreatePresence(c echo.Context) error
 	HandleUpdatePresence(c echo.Context) error
@@ -28,6 +29,16 @@ func NewPresenceHandler(s PresenceServiceInterface, v lib.ValidatorServiceInterf
 		Service:   s,
 		Validator: v,
 	}
+}
+
+// Get all presences
+func (h *PresenceHandler) HandleGetPresences(c echo.Context) error {
+	presence, err := h.Service.GetPresences(c)
+	if err != nil {
+		return lib.WriteError(c, http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, presence)
 }
 
 // Get presence by ID

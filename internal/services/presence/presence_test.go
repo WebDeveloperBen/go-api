@@ -1,14 +1,26 @@
 package presence_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
 	"github.com/webdeveloperben/go-api/internal/services/presence"
 	"github.com/webdeveloperben/go-api/internal/testutils"
 )
+
+func InsertTestUser(queries *repository.Queries, userID string) error {
+	err := queries.CreateUser(context.Background(), repository.CreateUserParams{
+		Fullname:      "test_user",
+		Email:         "test@user.com",
+		EmailVerified: true,
+		Image:         "",
+	})
+	return err
+}
 
 func TestPresenceHandler(t *testing.T) {
 	app, deps, cleanup := testutils.SetupAppWithTestDB(t)
@@ -20,6 +32,8 @@ func TestPresenceHandler(t *testing.T) {
 	presenceService := presence.NewPresenceService(presenceStorage)
 	presenceHandler := presence.NewPresenceHandler(presenceService, deps.Validator)
 	presence.NewPresenceRouter(api, presenceHandler)
+	userID := "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+	require.NoError(t, InsertTestUser(deps, userID))
 
 	tests := []struct {
 		name           string
@@ -42,7 +56,7 @@ func TestPresenceHandler(t *testing.T) {
 			method: http.MethodPost,
 			path:   "/api/v1/presence",
 			body: map[string]interface{}{
-				"user_id":     "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+				"user_id":     userID,
 				"last_status": "online",
 			},
 			expectedStatus: http.StatusCreated,

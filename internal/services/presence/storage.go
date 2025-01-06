@@ -35,7 +35,10 @@ func NewPresenceStorage(queries *repository.Queries) *PresenceStorage {
 func (s *PresenceStorage) GetPresenceByID(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error) {
 	row, err := s.Queries.GetPresenceByID(ctx.Request().Context(), id)
 	if err != nil {
-		return nil, lib.WriteError(ctx, http.StatusInternalServerError, fmt.Errorf("failed to fetch presence: %w", err))
+		if err == sql.ErrNoRows {
+			return nil, lib.NewPublicError("presence not found", fmt.Sprintf("no presence record found for id: %s", id))
+		}
+		return nil, lib.NewPublicError("failed to fetch presence", fmt.Sprintf("database error: %v", err))
 	}
 	return &row, nil
 }
@@ -51,7 +54,7 @@ func (s *PresenceStorage) InsertPresence(ctx echo.Context, presence repository.I
 // UpdatePresence updates an existing presence record
 func (s *PresenceStorage) UpdatePresence(ctx echo.Context, presence repository.UpdatePresenceParams) error {
 	if err := s.Queries.UpdatePresence(ctx.Request().Context(), presence); err != nil {
-		return lib.WriteError(ctx, http.StatusInternalServerError, fmt.Errorf("failed to update presence: %w", err))
+		return lib.NewPublicError("failed to update presence", fmt.Sprintf("database error: %v", err))
 	}
 	return nil
 }
@@ -59,7 +62,7 @@ func (s *PresenceStorage) UpdatePresence(ctx echo.Context, presence repository.U
 // DeletePresence deletes a presence record by ID
 func (s *PresenceStorage) DeletePresence(ctx echo.Context, id uuid.UUID) error {
 	if err := s.Queries.DeletePresence(ctx.Request().Context(), id); err != nil {
-		return lib.WriteError(ctx, http.StatusInternalServerError, fmt.Errorf("failed to delete presence: %w", err))
+		return lib.NewPublicError("failed to delete presence", fmt.Sprintf("database error: %v", err))
 	}
 	return nil
 }
@@ -68,11 +71,10 @@ func (s *PresenceStorage) DeletePresence(ctx echo.Context, id uuid.UUID) error {
 func (s *PresenceStorage) GetAllPresence(ctx echo.Context) ([]repository.GetAllPresenceRow, error) {
 	rows, err := s.Queries.GetAllPresence(ctx.Request().Context())
 	if err != nil {
-		// Check if the error is due to no rows being found
 		if err == sql.ErrNoRows {
-			return []repository.GetAllPresenceRow{}, nil
+			return []repository.GetAllPresenceRow{}, nil // Return empty array for no rows
 		}
-		return nil, fmt.Errorf("failed to fetch presences: %w", err)
+		return nil, lib.NewPublicError("failed to fetch presences", fmt.Sprintf("database error: %v", err))
 	}
 	return rows, nil
 }
@@ -80,7 +82,7 @@ func (s *PresenceStorage) GetAllPresence(ctx echo.Context) ([]repository.GetAllP
 // UpdateLogoutTime updates the logout time for a presence record
 func (s *PresenceStorage) UpdateLogoutTime(ctx echo.Context, params repository.UpdateLogoutTimeParams) error {
 	if err := s.Queries.UpdateLogoutTime(ctx.Request().Context(), params); err != nil {
-		return lib.WriteError(ctx, http.StatusInternalServerError, fmt.Errorf("failed to update logout time: %w", err))
+		return lib.NewPublicError("failed to update logout time", fmt.Sprintf("database error: %v", err))
 	}
 	return nil
 }

@@ -31,3 +31,19 @@ sql:
               type: "Time"
               pointer: true
             nullable: true
+          - db_type: "text"
+            go_type:
+              type: "string"
+          - db_type: "text"
+            go_type:
+              type: "string"
+              pointer: false
+            nullable: true
+          - db_type: "boolean"
+            go_type:
+              type: "bool"
+          - db_type: "boolean"
+            go_type:
+              type: "bool"
+              pointer: false
+            nullable: false
