@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -89,7 +90,17 @@ func IsValidUUID(u string) bool {
 func ValidateRequest(v ValidatorServiceInterface, data interface{}) error {
 	errors := v.Validate(data)
 	if len(errors) > 0 {
-		return invalidRequestData(errors)
+		return &ErrorResponse{
+			Errors: formatValidationErrors(errors),
+		}
 	}
 	return nil
+}
+
+func formatValidationErrors(errors []ValidatorErrorResponse) map[string]string {
+	errorMap := make(map[string]string)
+	for _, err := range errors {
+		errorMap[strings.ToLower(err.ErrorField)] = strings.ToLower(err.Message)
+	}
+	return errorMap
 }

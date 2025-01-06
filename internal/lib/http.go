@@ -55,8 +55,27 @@ type JSONResponse struct {
 
 // ErrorResponse represents an error API response.
 type ErrorResponse struct {
-	Error     interface{} `json:"error"`
+	Errors    interface{} `json:"error"`
 	RequestID string      `json:"request_id"`
+}
+
+// Implement the error interface
+func (e *ErrorResponse) Error() string {
+	// Convert the Error field to a string for the error message
+	switch v := e.Errors.(type) {
+	case string:
+		return v
+	case []string:
+		return strings.Join(v, ", ")
+	case map[string]string:
+		var parts []string
+		for key, value := range v {
+			parts = append(parts, fmt.Sprintf("%s: %s", key, value))
+		}
+		return strings.Join(parts, ", ")
+	default:
+		return "unknown error"
+	}
 }
 
 /**
@@ -102,7 +121,7 @@ func WriteError(c echo.Context, status int, err error) error {
 
 	// Return the sanitized error response to the client
 	return c.JSON(status, ErrorResponse{
-		Error:     publicErrors,
+		Errors:    publicErrors,
 		RequestID: requestID,
 	})
 }
@@ -130,8 +149,13 @@ func WriteJSON(c echo.Context, status int, v interface{}) error {
 * Helper func to standardise invalid request validation error responses sent to the client
  */
 func InvalidRequest(c echo.Context, err error) error {
-	// the err here is a map of validation errors created from the invalidRequestData func
-	return c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+	// Check if the error is already an ErrorResponse
+	if errorResponse, ok := err.(*ErrorResponse); ok {
+		return c.JSON(http.StatusUnprocessableEntity, errorResponse)
+	}
+
+	// Fallback for other error types
+	return c.JSON(http.StatusUnprocessableEntity, ErrorResponse{Errors: err.Error()})
 }
 
 /*
@@ -148,15 +172,16 @@ func invalidRequestData(errors []ValidatorErrorResponse) error {
 	if len(errors) == 0 {
 		return nil
 	}
-	errorMap := make(map[string]string)
+
+	errorMessages := make(map[string]string)
 	for _, err := range errors {
-		// lowercase all error messages to the client
-		errorMap[strings.ToLower(err.ErrorField)] = strings.ToLower(err.Message)
+		// Use JSON tags as field keys and lowercase error messages
+		errorMessages[strings.ToLower(err.ErrorField)] = strings.ToLower(err.Message)
 	}
-	// return an echo error struct here to be able to return an error with a formatted response of errors
-	return &echo.HTTPError{
-		Code:    http.StatusBadRequest,
-		Message: ErrorResponse{Error: errorMap},
+
+	// Return a structured ErrorResponse instead of an HTTPError
+	return &ErrorResponse{
+		Errors: errorMessages,
 	}
 }
 

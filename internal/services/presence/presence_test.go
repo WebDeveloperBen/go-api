@@ -53,7 +53,7 @@ func TestPresenceHandler(t *testing.T) {
 			path:           "/api/v1/presence",
 			body:           nil,
 			expectedStatus: http.StatusOK,
-			expectedBody:   "[]", // Assuming an empty array is returned
+			expectedBody:   "[]",
 		},
 		{
 			name:   "Create a presence record",
@@ -64,7 +64,7 @@ func TestPresenceHandler(t *testing.T) {
 				"last_status": "online",
 			},
 			expectedStatus: http.StatusCreated,
-			expectedBody:   `"last_status":"online"`, // Partial match for response
+			expectedBody:   `"last_status":"online"`,
 		},
 		{
 			name:   "Invalid request - missing user_id",
@@ -73,8 +73,69 @@ func TestPresenceHandler(t *testing.T) {
 			body: map[string]interface{}{
 				"last_status": "offline",
 			},
-			expectedStatus: http.StatusBadRequest,
+			expectedStatus: http.StatusUnprocessableEntity,
 			expectedBody:   `"user_id":"user_id is a required field"`,
+		},
+		{
+			name:   "Invalid request - invalid user_id format",
+			method: http.MethodPost,
+			path:   "/api/v1/presence",
+			body: map[string]interface{}{
+				"user_id":     "invalid-uuid",
+				"last_status": "online",
+			},
+			expectedStatus: http.StatusUnprocessableEntity,
+			expectedBody:   `"user_id":"user_id must be a valid uuid"`,
+		},
+		{
+			name:   "Invalid request - missing last_status",
+			method: http.MethodPost,
+			path:   "/api/v1/presence",
+			body: map[string]interface{}{
+				"user_id": userID,
+			},
+			expectedStatus: http.StatusUnprocessableEntity,
+			expectedBody:   `"last_status":"last_status is a required field"`,
+		},
+		{
+			name:           "Get presences - with data",
+			method:         http.MethodGet,
+			path:           "/api/v1/presence",
+			body:           nil,
+			expectedStatus: http.StatusOK,
+			expectedBody:   `"last_status":"online"`,
+		},
+		{
+			name:   "Duplicate presence record - returns 201 and updates",
+			method: http.MethodPost,
+			path:   "/api/v1/presence",
+			body: map[string]interface{}{
+				"user_id":     userID,
+				"last_status": "offline",
+			},
+			expectedStatus: http.StatusCreated,
+			expectedBody:   `"last_status":"offline"`,
+		},
+		{
+			name:   "Create a presence record with optional fields",
+			method: http.MethodPost,
+			path:   "/api/v1/presence",
+			body: map[string]interface{}{
+				"user_id":     userID,
+				"last_status": "online",
+				"last_login":  "2025-01-07T10:00:00Z",
+				"last_logout": "2025-01-07T12:00:00Z",
+			},
+			expectedStatus: http.StatusCreated,
+			expectedBody:   `"last_status":"online"`,
+		},
+		{
+			name:           "Invalid request - missing payload",
+			method:         http.MethodPost,
+			path:           "/api/v1/presence",
+			body:           nil,
+			expectedStatus: http.StatusUnprocessableEntity,
+			expectedBody:   `{"error":{"last_status":"last_status is a required field","user_id":"user_id is a required field"},"request_id":""}`,
 		},
 	}
 

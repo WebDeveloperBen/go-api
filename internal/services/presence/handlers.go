@@ -70,7 +70,7 @@ func (h *PresenceHandler) HandleCreatePresence(c echo.Context) error {
 	}
 
 	if err := lib.ValidateRequest(h.Validator, req); err != nil {
-		return lib.WriteError(c, http.StatusBadRequest, err)
+		return lib.InvalidRequest(c, err)
 	}
 
 	parsedUUID, err := lib.ParseUUID(req.UserID)
@@ -94,16 +94,20 @@ func (h *PresenceHandler) HandleCreatePresence(c echo.Context) error {
 
 // Update presence record
 func (h *PresenceHandler) HandleUpdatePresence(c echo.Context) error {
-	var presence repository.UpdatePresenceParams
-	if err := c.Bind(&presence); err != nil {
+	var req repository.UpdatePresenceParams
+	if err := c.Bind(&req); err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	if err := h.Service.UpdatePresence(c, presence); err != nil {
+	if err := lib.ValidateRequest(h.Validator, req); err != nil {
+		return lib.InvalidRequest(c, err)
+	}
+
+	if err := h.Service.UpdatePresence(c, req); err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 
-	return lib.WriteJSON(c, http.StatusOK, presence)
+	return lib.WriteJSON(c, http.StatusOK, req)
 }
 
 // Delete presence record
@@ -112,6 +116,7 @@ func (h *PresenceHandler) HandleDeletePresence(c echo.Context) error {
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
+
 	if err := h.Service.DeletePresence(c, parsedUUID); err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
