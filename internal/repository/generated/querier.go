@@ -12,13 +12,21 @@ import (
 
 type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) error
+	DeleteAsset(ctx context.Context, id uuid.UUID) error
 	DeletePresence(ctx context.Context, userID uuid.UUID) error
 	DeleteUser(ctx context.Context, id uuid.UUID) (int64, error)
+	GetAllAssetsPaginated(ctx context.Context, arg GetAllAssetsPaginatedParams) ([]Asset, error)
 	GetAllPresence(ctx context.Context) ([]GetAllPresenceRow, error)
 	GetAllUsers(ctx context.Context) ([]GetAllUsersRow, error)
+	GetAssetByFileName(ctx context.Context, fileName string) (Asset, error)
+	GetAssetByID(ctx context.Context, id uuid.UUID) (Asset, error)
+	GetAssetsCount(ctx context.Context) (int64, error)
 	GetPresenceByID(ctx context.Context, userID uuid.UUID) (GetPresenceByIDRow, error)
+	GetPublicAssetsPaginated(ctx context.Context, arg GetPublicAssetsPaginatedParams) ([]Asset, error)
 	GetUser(ctx context.Context, id uuid.UUID) (GetUserRow, error)
+	InsertAsset(ctx context.Context, arg InsertAssetParams) (Asset, error)
 	InsertPresence(ctx context.Context, arg InsertPresenceParams) error
+	UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset, error)
 	UpdateLogoutTime(ctx context.Context, arg UpdateLogoutTimeParams) error
 	UpdatePresence(ctx context.Context, arg UpdatePresenceParams) error
 	UpdateUser(ctx context.Context, arg UpdateUserParams) error

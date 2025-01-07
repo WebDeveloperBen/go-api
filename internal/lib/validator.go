@@ -10,6 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	enTranslations "github.com/go-playground/validator/v10/translations/en"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 )
 
 type ValidatorServiceInterface interface {
@@ -85,6 +86,14 @@ func IsValidUUID(u string) bool {
 	return err == nil
 }
 
+func GetValidParam(c echo.Context, name string) (string, error) {
+	param := c.Param(name)
+	if param == "" {
+		return "", fmt.Errorf("parameter '%s' is required", name)
+	}
+	return param, nil
+}
+
 // Helper function to parse and validate handler request objects.
 // If an error occurs this will return InvalidRequestData error
 func ValidateRequest(v ValidatorServiceInterface, data interface{}) error {
@@ -103,4 +112,19 @@ func formatValidationErrors(errors []ValidatorErrorResponse) map[string]string {
 		errorMap[strings.ToLower(err.ErrorField)] = strings.ToLower(err.Message)
 	}
 	return errorMap
+}
+
+func BindAndValidate(c echo.Context, v ValidatorServiceInterface, data interface{}) error {
+	// Bind the request payload to the struct
+	if err := c.Bind(data); err != nil {
+		return InvalidJSON(c)
+	}
+
+	if validationErrors := v.Validate(data); len(validationErrors) > 0 {
+		return InvalidRequest(c, &ErrorResponse{
+			Errors: formatValidationErrors(validationErrors),
+		})
+	}
+
+	return nil
 }
