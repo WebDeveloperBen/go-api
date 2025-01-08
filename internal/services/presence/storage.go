@@ -1,23 +1,22 @@
 package presence
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/labstack/echo/v4"
 	"github.com/webdeveloperben/go-api/internal/lib"
 	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
 )
 
 type PresenceStorageInterface interface {
-	GetPresenceByID(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error)
-	InsertPresence(ctx echo.Context, presence repository.InsertPresenceParams) error
-	UpdatePresence(ctx echo.Context, presence repository.UpdatePresenceParams) error
-	DeletePresence(ctx echo.Context, id uuid.UUID) error
-	GetAllPresence(ctx echo.Context) ([]repository.GetAllPresenceRow, error)
-	UpdateLogoutTime(ctx echo.Context, params repository.UpdateLogoutTimeParams) error
+	GetPresenceByID(ctx context.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error)
+	InsertPresence(ctx context.Context, presence repository.InsertPresenceParams) error
+	UpdatePresence(ctx context.Context, presence repository.UpdatePresenceParams) error
+	DeletePresence(ctx context.Context, id uuid.UUID) error
+	GetAllPresence(ctx context.Context) ([]repository.GetAllPresenceRow, error)
+	UpdateLogoutTime(ctx context.Context, params repository.UpdateLogoutTimeParams) error
 }
 
 type PresenceStorage struct {
@@ -25,15 +24,15 @@ type PresenceStorage struct {
 }
 
 // NewPresenceStorage creates a new storage layer for presence
-func NewPresenceStorage(queries *repository.Queries) *PresenceStorage {
+func NewStorage(queries *repository.Queries) *PresenceStorage {
 	return &PresenceStorage{
 		Queries: queries,
 	}
 }
 
 // GetPresenceByID retrieves a presence record by ID
-func (s *PresenceStorage) GetPresenceByID(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error) {
-	row, err := s.Queries.GetPresenceByID(ctx.Request().Context(), id)
+func (s *PresenceStorage) GetPresenceByID(ctx context.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error) {
+	row, err := s.Queries.GetPresenceByID(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, lib.NewPublicError("presence not found", fmt.Sprintf("no presence record found for id: %s", id))
@@ -44,32 +43,32 @@ func (s *PresenceStorage) GetPresenceByID(ctx echo.Context, id uuid.UUID) (*repo
 }
 
 // InsertPresence inserts a new presence record
-func (s *PresenceStorage) InsertPresence(ctx echo.Context, presence repository.InsertPresenceParams) error {
-	if err := s.Queries.InsertPresence(ctx.Request().Context(), presence); err != nil {
-		return lib.WriteError(ctx, http.StatusInternalServerError, fmt.Errorf("failed to insert presence: %w", err))
+func (s *PresenceStorage) InsertPresence(ctx context.Context, presence repository.InsertPresenceParams) error {
+	if err := s.Queries.InsertPresence(ctx, presence); err != nil {
+		return lib.NewPublicError("presence not found", fmt.Sprintf("failed to insert presence: %+v", err))
 	}
 	return nil
 }
 
 // UpdatePresence updates an existing presence record
-func (s *PresenceStorage) UpdatePresence(ctx echo.Context, presence repository.UpdatePresenceParams) error {
-	if err := s.Queries.UpdatePresence(ctx.Request().Context(), presence); err != nil {
+func (s *PresenceStorage) UpdatePresence(ctx context.Context, presence repository.UpdatePresenceParams) error {
+	if err := s.Queries.UpdatePresence(ctx, presence); err != nil {
 		return lib.NewPublicError("failed to update presence", fmt.Sprintf("database error: %v", err))
 	}
 	return nil
 }
 
 // DeletePresence deletes a presence record by ID
-func (s *PresenceStorage) DeletePresence(ctx echo.Context, id uuid.UUID) error {
-	if err := s.Queries.DeletePresence(ctx.Request().Context(), id); err != nil {
+func (s *PresenceStorage) DeletePresence(ctx context.Context, id uuid.UUID) error {
+	if err := s.Queries.DeletePresence(ctx, id); err != nil {
 		return lib.NewPublicError("failed to delete presence", fmt.Sprintf("database error: %v", err))
 	}
 	return nil
 }
 
 // GetAllPresence retrieves all presence records
-func (s *PresenceStorage) GetAllPresence(ctx echo.Context) ([]repository.GetAllPresenceRow, error) {
-	rows, err := s.Queries.GetAllPresence(ctx.Request().Context())
+func (s *PresenceStorage) GetAllPresence(ctx context.Context) ([]repository.GetAllPresenceRow, error) {
+	rows, err := s.Queries.GetAllPresence(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return []repository.GetAllPresenceRow{}, nil // Return empty array for no rows
@@ -80,8 +79,8 @@ func (s *PresenceStorage) GetAllPresence(ctx echo.Context) ([]repository.GetAllP
 }
 
 // UpdateLogoutTime updates the logout time for a presence record
-func (s *PresenceStorage) UpdateLogoutTime(ctx echo.Context, params repository.UpdateLogoutTimeParams) error {
-	if err := s.Queries.UpdateLogoutTime(ctx.Request().Context(), params); err != nil {
+func (s *PresenceStorage) UpdateLogoutTime(ctx context.Context, params repository.UpdateLogoutTimeParams) error {
+	if err := s.Queries.UpdateLogoutTime(ctx, params); err != nil {
 		return lib.NewPublicError("failed to update logout time", fmt.Sprintf("database error: %v", err))
 	}
 	return nil

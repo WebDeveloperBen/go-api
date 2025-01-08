@@ -20,6 +20,8 @@ type AssetsHandlerInterface interface {
 	HandleGetAssetsCount(c echo.Context) error
 }
 
+var _ AssetsHandlerInterface = (*AssetsHandler)(nil)
+
 // AssetsHandler struct
 type AssetsHandler struct {
 	Service   AssetsServiceInterface
@@ -27,7 +29,7 @@ type AssetsHandler struct {
 }
 
 // Create a new assets handler
-func NewAssetsHandler(service AssetsServiceInterface, validator lib.ValidatorServiceInterface) *AssetsHandler {
+func NewHandler(service AssetsServiceInterface, validator lib.ValidatorServiceInterface) *AssetsHandler {
 	return &AssetsHandler{
 		Service:   service,
 		Validator: validator,
@@ -36,12 +38,14 @@ func NewAssetsHandler(service AssetsServiceInterface, validator lib.ValidatorSer
 
 // HandleGetAllAssets retrieves all assets with pagination
 func (h *AssetsHandler) HandleGetAllAssets(c echo.Context) error {
-	limit, offset, err := lib.ParsePaginationParams(c)
+	var req repository.GetAllAssetsPaginatedParams
+
+	err := lib.ValidateParams(c, h.Validator, req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	assets, err := h.Service.GetAllAssets(c, limit, offset)
+	assets, err := h.Service.GetAllAssets(c, int(req.Limit), int(req.Offset))
 	if err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
@@ -51,12 +55,13 @@ func (h *AssetsHandler) HandleGetAllAssets(c echo.Context) error {
 
 // HandleGetPublicAssets retrieves public assets with pagination
 func (h *AssetsHandler) HandleGetPublicAssets(c echo.Context) error {
-	limit, offset, err := lib.ParsePaginationParams(c)
+	var req repository.GetPublicAssetsPaginatedParams
+
+	err := lib.ValidateParams(c, h.Validator, req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
-
-	assets, err := h.Service.GetPublicAssets(c, limit, offset)
+	assets, err := h.Service.GetPublicAssets(c, int(req.Limit), int(req.Offset))
 	if err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
@@ -81,12 +86,14 @@ func (h *AssetsHandler) HandleGetAssetByID(c echo.Context) error {
 
 // HandleGetAssetByFileName retrieves an asset by file name
 func (h *AssetsHandler) HandleGetAssetByFileName(c echo.Context) error {
-	fileName, err := lib.GetValidParam(c, "fileName")
+	var req GetAssetByFileNameRequest
+
+	err := lib.ValidateParams(c, h.Validator, req)
 	if err != nil {
-		return lib.WriteError(c, http.StatusUnprocessableEntity, err)
+		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	asset, err := h.Service.GetAssetByFileName(c, fileName)
+	asset, err := h.Service.GetAssetByFileName(c, req.FileName)
 	if err != nil {
 		return lib.WriteError(c, http.StatusNotFound, err)
 	}
@@ -97,12 +104,10 @@ func (h *AssetsHandler) HandleGetAssetByFileName(c echo.Context) error {
 // HandleCreateAsset creates a new asset
 func (h *AssetsHandler) HandleCreateAsset(c echo.Context) error {
 	var req repository.InsertAssetParams
-	if err := c.Bind(&req); err != nil {
-		return lib.InvalidJSON(c)
-	}
 
-	if err := lib.ValidateRequest(h.Validator, req); err != nil {
-		return lib.InvalidRequest(c, err)
+	err := lib.ValidateParams(c, h.Validator, req)
+	if err != nil {
+		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
 	asset, err := h.Service.CreateAsset(c, req)
@@ -115,21 +120,14 @@ func (h *AssetsHandler) HandleCreateAsset(c echo.Context) error {
 
 // HandleUpdateAsset updates an existing asset
 func (h *AssetsHandler) HandleUpdateAsset(c echo.Context) error {
-	id, err := lib.GetUUIDParam(c, "id")
+	var req repository.UpdateAssetParams
+
+	err := lib.ValidateParams(c, h.Validator, req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	var req repository.UpdateAssetParams
-	if err := c.Bind(&req); err != nil {
-		return lib.InvalidJSON(c)
-	}
-
-	if err := lib.ValidateRequest(h.Validator, req); err != nil {
-		return lib.InvalidRequest(c, err)
-	}
-
-	asset, err := h.Service.UpdateAsset(c, id, req)
+	asset, err := h.Service.UpdateAsset(c, req.ID, req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
@@ -139,12 +137,14 @@ func (h *AssetsHandler) HandleUpdateAsset(c echo.Context) error {
 
 // HandleDeleteAsset deletes an asset by ID
 func (h *AssetsHandler) HandleDeleteAsset(c echo.Context) error {
-	id, err := lib.GetUUIDParam(c, "id")
+	var req DeleteAssetRequest
+
+	err := lib.ValidateParams(c, h.Validator, req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	if err := h.Service.DeleteAsset(c, id); err != nil {
+	if err := h.Service.DeleteAsset(c, req.ID); err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 

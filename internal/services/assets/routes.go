@@ -9,7 +9,7 @@ type Router struct {
 	Handler *AssetsHandler
 }
 
-func NewAssetRouter(group *echo.Group, handler *AssetsHandler) {
+func NewRouter(group *echo.Group, handler *AssetsHandler) {
 	r := &Router{
 		Group:   group,
 		Handler: handler,

@@ -9,7 +9,7 @@ type Router struct {
 	Handler *PresenceHandler
 }
 
-func NewPresenceRouter(group *echo.Group, handler *PresenceHandler) {
+func NewRouter(group *echo.Group, handler *PresenceHandler) {
 	r := &Router{
 		Group:   group,
 		Handler: handler,

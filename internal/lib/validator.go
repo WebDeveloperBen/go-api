@@ -114,7 +114,7 @@ func formatValidationErrors(errors []ValidatorErrorResponse) map[string]string {
 	return errorMap
 }
 
-func BindAndValidate(c echo.Context, v ValidatorServiceInterface, data interface{}) error {
+func ValidateParams(c echo.Context, v ValidatorServiceInterface, data interface{}) error {
 	// Bind the request payload to the struct
 	if err := c.Bind(data); err != nil {
 		return InvalidJSON(c)

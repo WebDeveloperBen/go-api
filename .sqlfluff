@@ -1,0 +1,14 @@
+[sqlfluff]
+dialect = postgres  # Use PostgreSQL dialect
+templater = placeholder
+exclude_rules = L003,L001  # Example: Exclude rules for line indentation and length (optional)
+
+[sqlfluff:templater:jinja]
+# Define placeholders for the positional parameters
+# These can be simple replacements to make them parseable by sqlfluff.
+param_style = dollar
+
+[sqlfluff:rules]
+# Customize linting rules
+max_line_length = 120  # Increase line length limit (adjust as needed)
+exclude_rules = L016

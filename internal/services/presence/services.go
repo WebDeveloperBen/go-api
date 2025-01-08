@@ -20,7 +20,7 @@ type PresenceService struct {
 }
 
 // NewPresenceService creates a new presence service
-func NewPresenceService(storage PresenceStorageInterface) *PresenceService {
+func NewService(storage PresenceStorageInterface) *PresenceService {
 	return &PresenceService{
 		Storage: storage,
 	}
@@ -28,25 +28,25 @@ func NewPresenceService(storage PresenceStorageInterface) *PresenceService {
 
 // GetPresences retrieves all presences
 func (s *PresenceService) GetPresences(ctx echo.Context) ([]repository.GetAllPresenceRow, error) {
-	return s.Storage.GetAllPresence(ctx)
+	return s.Storage.GetAllPresence(ctx.Request().Context())
 }
 
 // GetPresence retrieves a presence record by ID
 func (s *PresenceService) GetPresence(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error) {
-	return s.Storage.GetPresenceByID(ctx, id)
+	return s.Storage.GetPresenceByID(ctx.Request().Context(), id)
 }
 
 // CreatePresence creates a new presence record
 func (s *PresenceService) CreatePresence(ctx echo.Context, presence repository.InsertPresenceParams) error {
-	return s.Storage.InsertPresence(ctx, presence)
+	return s.Storage.InsertPresence(ctx.Request().Context(), presence)
 }
 
 // UpdatePresence updates an existing presence record
 func (s *PresenceService) UpdatePresence(ctx echo.Context, presence repository.UpdatePresenceParams) error {
-	return s.Storage.UpdatePresence(ctx, presence)
+	return s.Storage.UpdatePresence(ctx.Request().Context(), presence)
 }
 
 // DeletePresence deletes a presence record by ID
 func (s *PresenceService) DeletePresence(ctx echo.Context, id uuid.UUID) error {
-	return s.Storage.DeletePresence(ctx, id)
+	return s.Storage.DeletePresence(ctx.Request().Context(), id)
 }

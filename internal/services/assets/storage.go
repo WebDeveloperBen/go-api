@@ -6,29 +6,30 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/labstack/echo/v4"
 	"github.com/webdeveloperben/go-api/internal/lib"
 	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
 )
 
 // AssetsStorageInterface defines methods that the assets service can call
 type AssetsStorageInterface interface {
-	GetAllAssetsPaginated(ctx echo.Context, limit, offset int) ([]repository.Asset, error)
-	GetPublicAssetsPaginated(ctx echo.Context, limit, offset int) ([]repository.Asset, error)
-	GetAssetByID(ctx echo.Context, id uuid.UUID) (*repository.Asset, error)
-	GetAssetByFileName(ctx echo.Context, fileName string) (*repository.Asset, error)
-	InsertAsset(ctx echo.Context, asset repository.InsertAssetParams) (*repository.Asset, error)
-	UpdateAsset(ctx echo.Context, id uuid.UUID, asset repository.UpdateAssetParams) (*repository.Asset, error)
-	DeleteAsset(ctx echo.Context, id uuid.UUID) error
-	GetAssetsCount(ctx echo.Context) (int64, error)
+	GetAllAssetsPaginated(ctx context.Context, limit, offset int) ([]repository.Asset, error)
+	GetPublicAssetsPaginated(ctx context.Context, limit, offset int) ([]repository.Asset, error)
+	GetAssetByID(ctx context.Context, id uuid.UUID) (*repository.Asset, error)
+	GetAssetByFileName(ctx context.Context, fileName string) (*repository.Asset, error)
+	InsertAsset(ctx context.Context, asset repository.InsertAssetParams) (repository.Asset, error)
+	UpdateAsset(ctx context.Context, id uuid.UUID, asset repository.UpdateAssetParams) (repository.Asset, error)
+	DeleteAsset(ctx context.Context, id uuid.UUID) error
+	GetAssetsCount(ctx context.Context) (int64, error)
 }
+
+var _ AssetsStorageInterface = (*AssetsStorage)(nil)
 
 type AssetsStorage struct {
 	queries *repository.Queries
 }
 
 // NewAssetsStorage creates a new instance of AssetsStorage
-func NewAssetsStorage(queries *repository.Queries) *AssetsStorage {
+func NewStorage(queries *repository.Queries) *AssetsStorage {
 	return &AssetsStorage{queries: queries}
 }
 

@@ -1,43 +1,32 @@
-package presence_test
+package integration_test
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/webdeveloperben/go-api/internal/lib"
 	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
 	"github.com/webdeveloperben/go-api/internal/services/presence"
-	"github.com/webdeveloperben/go-api/internal/testutils"
+	"github.com/webdeveloperben/go-api/internal/tests/test_utils"
 )
 
-func InsertTestUser(deps *lib.AppDependencies, userID string) error {
-	_, err := deps.DB.Exec(context.Background(), `
-		INSERT INTO users (id, fullname, email)
-		VALUES ($1, $2, $3)
-		ON CONFLICT (id) DO NOTHING;
-	`, userID, "Test User", "testuser@example.com")
-	return err
-}
-
 func TestPresenceHandler(t *testing.T) {
-	app, deps, cleanup := testutils.SetupAppWithTestDB(t)
+	app, deps, cleanup := test_utils.SetupAppWithTestDB(t)
 	defer cleanup()
 
 	api := app.Group("/api/v1")
 	queries := repository.New(deps.DB)
-	presenceStorage := presence.NewPresenceStorage(queries)
-	presenceService := presence.NewPresenceService(presenceStorage)
-	presenceHandler := presence.NewPresenceHandler(presenceService, deps.Validator)
-	presence.NewPresenceRouter(api, presenceHandler)
+	presenceStorage := presence.NewStorage(queries)
+	presenceService := presence.NewService(presenceStorage)
+	presenceHandler := presence.NewHandler(presenceService, deps.Validator)
+	presence.NewRouter(api, presenceHandler)
 
 	/**
 	 * Seed the service
 	 */
 	userID := "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-	require.NoError(t, InsertTestUser(deps, userID))
+	require.NoError(t, test_utils.InsertTestUser(deps, userID))
 
 	tests := []struct {
 		name           string
@@ -142,7 +131,7 @@ func TestPresenceHandler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Perform the request
-			rec, err := testutils.PerformRequest(app, tt.method, tt.path, tt.body, nil)
+			rec, err := test_utils.PerformRequest(app, tt.method, tt.path, tt.body, nil)
 			assert.NoError(t, err)
 
 			// Assert the status code

@@ -1,4 +1,4 @@
-./testutils
+./tests
 ./db
 Taskfile.yml
 compose.yml

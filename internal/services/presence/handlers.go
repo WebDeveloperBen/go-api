@@ -24,7 +24,7 @@ type PresenceHandler struct {
 }
 
 // Create a new presence handler
-func NewPresenceHandler(s PresenceServiceInterface, v lib.ValidatorServiceInterface) *PresenceHandler {
+func NewHandler(s PresenceServiceInterface, v lib.ValidatorServiceInterface) *PresenceHandler {
 	return &PresenceHandler{
 		Service:   s,
 		Validator: v,
@@ -48,7 +48,7 @@ func (h *PresenceHandler) HandleGetPresence(c echo.Context) error {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	req := HandleGetPresenceRequest{ID: parsedUUID}
+	req := GetPresenceRequest{ID: parsedUUID}
 	if err := lib.ValidateRequest(h.Validator, req); err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
