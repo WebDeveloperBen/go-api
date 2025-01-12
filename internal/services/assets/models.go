@@ -1,7 +1,5 @@
 package assets
 
-import "github.com/google/uuid"
-
 type GetAssetByFileNameRequest struct {
 	FileName string `json:"file_name" validate:"required"`
 }
@@ -22,7 +20,7 @@ func (r *GetAllAssetsPaginatedRequest) ApplyDefaults() {
 }
 
 type DeleteAssetRequest struct {
-	ID uuid.UUID `json:"id" validate:"required,uuid"`
+	ID string `param:"id" validate:"required, uuid"`
 }
 
 type InsertAssetRequest struct {

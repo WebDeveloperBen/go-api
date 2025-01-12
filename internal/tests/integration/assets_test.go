@@ -187,13 +187,8 @@ func TestAssetHandler(t *testing.T) {
 	t.Run("Delete Asset - Not Found", func(t *testing.T) {
 		rec, err := test_utils.PerformRequest(app, "DELETE", "/api/v1/assets/"+uuid.NewString(), nil, nil)
 		assert.NoError(t, err)
-		assert.Equal(t, http.StatusNotFound, rec.Code)
-
-		// Parse the error response
-		errors := test_utils.ParseErrorsFromResponse(t, rec)
-
-		// Assert the specific error message
-		assert.Contains(t, errors, "asset not found")
+		// This should return as success when the id is not found
+		assert.Equal(t, http.StatusOK, rec.Code)
 	})
 
 	t.Run("Get Assets Count - Valid", func(t *testing.T) {

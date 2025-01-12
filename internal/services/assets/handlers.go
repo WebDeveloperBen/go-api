@@ -146,14 +146,12 @@ func (h *AssetsHandler) HandleUpdateAsset(c echo.Context) error {
 
 // HandleDeleteAsset deletes an asset by ID
 func (h *AssetsHandler) HandleDeleteAsset(c echo.Context) error {
-	var req DeleteAssetRequest
-
-	err := lib.ValidateInputs(c, h.Validator, &req)
+	id, err := lib.GetValidUUIDParam(c, "id")
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	if err := h.Service.DeleteAsset(c, req.ID); err != nil {
+	if err := h.Service.DeleteAsset(c, id); err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 
