@@ -38,5 +38,6 @@ func GetValidAssetID(t *testing.T, deps *lib.AppDependencies) string {
 		SELECT id FROM assets LIMIT 1;
 	`).Scan(&id)
 	require.NoError(t, err)
+	lib.Logger.Info().Msgf("my id value from the database %+v", id)
 	return id
 }

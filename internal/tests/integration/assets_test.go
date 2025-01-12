@@ -161,7 +161,7 @@ func TestAssetHandler(t *testing.T) {
 	t.Run("Update Asset - Not Found", func(t *testing.T) {
 		body := map[string]interface{}{"file_name": "updated_file.jpg", "is_public": false}
 
-		rec, err := test_utils.PerformRequest(app, "PUT", "/api/v1/assets/"+uuid.NewString(), body, nil)
+		rec, err := test_utils.PerformRequest(app, "PATCH", "/api/v1/assets/"+uuid.NewString(), body, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusNotFound, rec.Code)
 

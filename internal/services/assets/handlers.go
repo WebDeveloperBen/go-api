@@ -5,7 +5,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/webdeveloperben/go-api/internal/lib"
-	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
 )
 
 // Interface for the assets handler
@@ -40,7 +39,7 @@ func NewHandler(service AssetsServiceInterface, validator lib.ValidatorServiceIn
 func (h *AssetsHandler) HandleGetAllAssets(c echo.Context) error {
 	var req GetAllAssetsPaginatedRequest
 
-	err := lib.ValidateParams(c, h.Validator, &req)
+	err := lib.ValidateInputs(c, h.Validator, &req)
 	lib.Logger.Info().Msgf("error recieed %+v", err)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
@@ -61,7 +60,7 @@ func (h *AssetsHandler) HandleGetAllAssets(c echo.Context) error {
 func (h *AssetsHandler) HandleGetPublicAssets(c echo.Context) error {
 	var req GetAllAssetsPaginatedRequest
 
-	err := lib.ValidateParams(c, h.Validator, &req)
+	err := lib.ValidateInputs(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
@@ -78,7 +77,7 @@ func (h *AssetsHandler) HandleGetPublicAssets(c echo.Context) error {
 
 // HandleGetAssetByID retrieves an asset by ID
 func (h *AssetsHandler) HandleGetAssetByID(c echo.Context) error {
-	id, err := lib.GetUUIDParam(c, "id")
+	id, err := lib.GetValidUUIDParam(c, "id")
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
@@ -95,7 +94,7 @@ func (h *AssetsHandler) HandleGetAssetByID(c echo.Context) error {
 func (h *AssetsHandler) HandleGetAssetByFileName(c echo.Context) error {
 	var req GetAssetByFileNameRequest
 
-	err := lib.ValidateParams(c, h.Validator, &req)
+	err := lib.ValidateInputs(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
@@ -112,7 +111,7 @@ func (h *AssetsHandler) HandleGetAssetByFileName(c echo.Context) error {
 func (h *AssetsHandler) HandleCreateAsset(c echo.Context) error {
 	var req InsertAssetRequest
 
-	err := lib.ValidateParams(c, h.Validator, &req)
+	err := lib.ValidateInputs(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
@@ -127,15 +126,18 @@ func (h *AssetsHandler) HandleCreateAsset(c echo.Context) error {
 
 // HandleUpdateAsset updates an existing asset
 func (h *AssetsHandler) HandleUpdateAsset(c echo.Context) error {
-	var req repository.UpdateAssetParams
-	lib.Logger.Info().Msgf("input values: %+v", req)
-	err := lib.ValidateParams(c, h.Validator, &req)
+	var req UpdateAssetRequest
+
+	err := lib.ValidateInputs(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	asset, err := h.Service.UpdateAsset(c, req.ID, req)
+	asset, err := h.Service.UpdateAsset(c, req)
 	if err != nil {
+		if publicErr, ok := err.(*lib.BaseError); ok && publicErr.PublicMessage() == "asset not found" {
+			return lib.WriteError(c, http.StatusNotFound, err)
+		}
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
 
@@ -146,7 +148,7 @@ func (h *AssetsHandler) HandleUpdateAsset(c echo.Context) error {
 func (h *AssetsHandler) HandleDeleteAsset(c echo.Context) error {
 	var req DeleteAssetRequest
 
-	err := lib.ValidateParams(c, h.Validator, &req)
+	err := lib.ValidateInputs(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}

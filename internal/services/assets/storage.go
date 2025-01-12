@@ -95,7 +95,20 @@ func (s *AssetsStorage) InsertAsset(ctx context.Context, asset repository.Insert
 }
 
 func (s *AssetsStorage) UpdateAsset(ctx context.Context, id uuid.UUID, asset repository.UpdateAssetParams) (repository.Asset, error) {
-	return s.queries.UpdateAsset(ctx, asset)
+	updatedAsset, err := s.queries.UpdateAsset(ctx, asset)
+	if err != nil {
+		fmt.Printf("Error type: %T, Error value: %v\n", err, err)
+
+		// Handle `sql.ErrNoRows` by string matching as a fallback
+		if errors.Is(err, sql.ErrNoRows) || err.Error() == "no rows in result set" {
+			return repository.Asset{}, lib.NewPublicError("asset not found", fmt.Sprintf("no asset record found for ID: %s", id.String()))
+		}
+
+		// Return other errors as internal server errors
+		return repository.Asset{}, lib.NewPublicError("failed to update asset", fmt.Sprintf("database error: %v", err))
+	}
+
+	return updatedAsset, nil
 }
 
 func (s *AssetsStorage) DeleteAsset(ctx context.Context, id uuid.UUID) error {

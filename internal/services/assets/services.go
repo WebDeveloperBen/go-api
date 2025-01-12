@@ -1,6 +1,8 @@
 package assets
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
@@ -13,7 +15,7 @@ type AssetsServiceInterface interface {
 	GetAssetByID(ctx echo.Context, id uuid.UUID) (*repository.Asset, error)
 	GetAssetByFileName(ctx echo.Context, fileName string) (*repository.Asset, error)
 	CreateAsset(ctx echo.Context, asset InsertAssetRequest) (repository.Asset, error)
-	UpdateAsset(ctx echo.Context, id uuid.UUID, asset repository.UpdateAssetParams) (repository.Asset, error)
+	UpdateAsset(ctx echo.Context, asset UpdateAssetRequest) (repository.Asset, error)
 	DeleteAsset(ctx echo.Context, id uuid.UUID) error
 	GetAssetsCount(ctx echo.Context) (int64, error)
 }
@@ -71,8 +73,25 @@ func (s *AssetsService) CreateAsset(ctx echo.Context, req InsertAssetRequest) (r
 }
 
 // UpdateAsset updates an existing asset and returns the updated record
-func (s *AssetsService) UpdateAsset(ctx echo.Context, id uuid.UUID, asset repository.UpdateAssetParams) (repository.Asset, error) {
-	return s.Storage.UpdateAsset(ctx.Request().Context(), id, asset)
+func (s *AssetsService) UpdateAsset(ctx echo.Context, req UpdateAssetRequest) (repository.Asset, error) {
+	parsedUUID, err := uuid.Parse(req.ID)
+	if err != nil {
+		return repository.Asset{}, fmt.Errorf("invalid uuid: %v", err)
+	}
+	// Map InsertAssetRequest to InsertAssetParams
+	params := repository.UpdateAssetParams{
+		ID:            parsedUUID,
+		FileName:      req.FileName,
+		ContentType:   req.ContentType,
+		ETag:          req.ETag,
+		ContainerName: req.ContainerName,
+		Uri:           req.Uri,
+		Size:          req.Size,
+		Metadata:      req.Metadata,
+		IsPublic:      req.IsPublic,
+		Published:     req.Published,
+	}
+	return s.Storage.UpdateAsset(ctx.Request().Context(), params.ID, params)
 }
 
 // DeleteAsset deletes an asset by ID
