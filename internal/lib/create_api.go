@@ -41,6 +41,7 @@ func CreateApi(ctx context.Context, cfg config.Config) (*echo.Echo, *AppDependen
 	// Initialize Echo app
 	app := echo.New()
 	app.Use(middleware.RequestID())
+
 	// Middleware
 	app.Use(middleware.Recover())
 	app.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{

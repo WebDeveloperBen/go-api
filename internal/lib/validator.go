@@ -114,15 +114,19 @@ func formatValidationErrors(errors []ValidatorErrorResponse) map[string]string {
 	return errorMap
 }
 
-func ValidateParams(c echo.Context, v ValidatorServiceInterface, data interface{}) error {
+func ValidateParams[T any](c echo.Context, v ValidatorServiceInterface, data *T) error {
 	// Bind the request payload to the struct
 	if err := c.Bind(data); err != nil {
 		return InvalidJSON(c)
 	}
 
-	if validationErrors := v.Validate(data); len(validationErrors) > 0 {
+	// Perform validation
+	validationErrors := v.Validate(data)
+	if len(validationErrors) > 0 {
+		// Convert validation errors into the appropriate format
+		formattedErrors := formatValidationErrors(validationErrors)
 		return InvalidRequest(c, &ErrorResponse{
-			Errors: formatValidationErrors(validationErrors),
+			Errors: formattedErrors,
 		})
 	}
 

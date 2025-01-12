@@ -15,7 +15,6 @@ tasks:
   run:
     desc: Run the application using Docker Compose and Air for hot reloading
     cmds:
-      - task build
       - docker-compose up -d
       - air
 

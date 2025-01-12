@@ -20,7 +20,7 @@ func SetupPostgresContainer(t *testing.T) (string, func()) {
 
 	// Get the absolute path to the migration directory
 	_, filename, _, _ := runtime.Caller(0) // Get the current file path
-	migrationsDir := filepath.Join(filepath.Dir(filename), "../../db/drizzle/src/migrations")
+	migrationsDir := filepath.Join(filepath.Dir(filename), "../../../db/drizzle/src/migrations/")
 
 	// Set up the PostgreSQL container
 	pgContainer, err := postgres.Run(ctx,
@@ -51,7 +51,7 @@ func SetupPostgresContainer(t *testing.T) (string, func()) {
 func runMigrations(connStr string, migrationsDir string) error {
 	// Get the absolute path to the migration directory
 	_, filename, _, _ := runtime.Caller(0) // Get the current file path
-	migratorLoc := filepath.Join(filepath.Dir(filename), "../../db/drizzle/migrate.mjs")
+	migratorLoc := filepath.Join(filepath.Dir(filename), "../../../db/drizzle/migrate.mjs")
 
 	// Construct the command to run the Node.js script
 	cmd := exec.Command("node", migratorLoc, connStr, migrationsDir)

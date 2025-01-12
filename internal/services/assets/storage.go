@@ -3,6 +3,7 @@ package assets
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -40,7 +41,7 @@ func (s *AssetsStorage) GetAllAssetsPaginated(ctx context.Context, limit, offset
 	}
 	assets, err := s.queries.GetAllAssetsPaginated(ctx, params)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, lib.NewPublicError("assets not found", "no asset records found")
 		}
 		return nil, lib.NewPublicError("failed to fetch assets", fmt.Sprintf("database error: %v", err))
@@ -53,6 +54,8 @@ func (s *AssetsStorage) GetPublicAssetsPaginated(ctx context.Context, limit, off
 		Limit:  int32(limit),
 		Offset: int32(offset),
 	}
+
+	lib.Logger.Info().Msg("HERE")
 	asset, err := s.queries.GetPublicAssetsPaginated(ctx, params)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -60,16 +63,18 @@ func (s *AssetsStorage) GetPublicAssetsPaginated(ctx context.Context, limit, off
 		}
 		return nil, lib.NewPublicError("failed to fetch assets", fmt.Sprintf("database error: %v", err))
 	}
+
+	lib.Logger.Info().Msg("asset")
 	return asset, nil
 }
 
 func (s *AssetsStorage) GetAssetByID(ctx context.Context, id uuid.UUID) (*repository.Asset, error) {
 	asset, err := s.queries.GetAssetByID(ctx, id)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) { // Check for wrapped errors
 			return nil, lib.NewPublicError("asset not found", fmt.Sprintf("no asset record found for id: %s", id))
 		}
-		return nil, lib.NewPublicError("failed to fetch asset", fmt.Sprintf("database error: %v", err))
+		return nil, lib.NewPublicError("asset not found", fmt.Sprintf("database error: %v", err))
 	}
 	return &asset, nil
 }

@@ -70,7 +70,8 @@ func (h *PresenceHandler) HandleCreatePresence(c echo.Context) error {
 	}
 
 	if err := lib.ValidateRequest(h.Validator, req); err != nil {
-		return lib.InvalidRequest(c, err)
+		return err
+		// TODO: fix return lib.InvalidRequest(c, err)
 	}
 
 	parsedUUID, err := lib.ParseUUID(req.UserID)
@@ -100,7 +101,8 @@ func (h *PresenceHandler) HandleUpdatePresence(c echo.Context) error {
 	}
 
 	if err := lib.ValidateRequest(h.Validator, req); err != nil {
-		return lib.InvalidRequest(c, err)
+		return err
+		// TODO: fix return lib.InvalidRequest(c, err)
 	}
 
 	if err := h.Service.UpdatePresence(c, req); err != nil {

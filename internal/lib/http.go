@@ -48,8 +48,8 @@ func NewPublicError(publicMsg, privateMsg string) *BaseError {
 	}
 }
 
-// JSONResponse represents a successful API response.
-type JSONResponse struct {
+// SuccessResponse represents a successful API response.
+type SuccessResponse struct {
 	Data interface{} `json:"data"`
 }
 
@@ -92,22 +92,27 @@ func WriteError(c echo.Context, status int, err error) error {
 
 	// Check if the error implements the PublicError interface
 	switch e := err.(type) {
-	case PublicError:
-		// Handle PublicError, which includes BaseError
+
+	case PublicError: // Handle PublicError, which includes BaseError
 		logMessage = e.PrivateMessage()
 		publicErrors = append(publicErrors, e.PublicMessage())
-	case *echo.HTTPError:
-		// Handle Echo-specific HTTP errors
+
+	case *ErrorResponse: // Handle ErrorResponse explicitly
+		publicErrors = append(publicErrors, e.Errors)
+		logMessage = e.Error()
+
+	case *echo.HTTPError: // Handle Echo-specific HTTP errors
 		if errResponse, ok := e.Message.(ErrorResponse); ok {
 			publicErrors = append(publicErrors, errResponse.Error)
 		} else {
 			publicErrors = append(publicErrors, e.Message)
 		}
 		logMessage = fmt.Sprintf("%v", e.Message)
+
 	default:
 		// Generic fallback for other error types
 		logMessage = err.Error()
-		publicErrors = append(publicErrors, "an unexpected error occurred")
+		publicErrors = append(publicErrors, logMessage)
 	}
 
 	// Log the detailed private error message
@@ -142,20 +147,14 @@ func WriteJSON(c echo.Context, status int, v interface{}) error {
 		data = []interface{}{v}
 	}
 
-	return c.JSON(status, JSONResponse{Data: data})
+	return c.JSON(status, SuccessResponse{Data: data})
 }
 
 /**
 * Helper func to standardise invalid request validation error responses sent to the client
  */
-func InvalidRequest(c echo.Context, err error) error {
-	// Check if the error is already an ErrorResponse
-	if errorResponse, ok := err.(*ErrorResponse); ok {
-		return c.JSON(http.StatusUnprocessableEntity, errorResponse)
-	}
-
-	// Fallback for other error types
-	return c.JSON(http.StatusUnprocessableEntity, ErrorResponse{Errors: err.Error()})
+func InvalidRequest(c echo.Context, err *ErrorResponse) error {
+	return err
 }
 
 /*
@@ -168,7 +167,7 @@ func InvalidJSON(c echo.Context) error {
 /*
 *  To be used to handle sending a map of validation errors to the client when invalid request data is sent to a handler
  */
-func invalidRequestData(errors []ValidatorErrorResponse) error {
+func InvalidRequestData(errors []ValidatorErrorResponse) error {
 	if len(errors) == 0 {
 		return nil
 	}
@@ -188,7 +187,7 @@ func invalidRequestData(errors []ValidatorErrorResponse) error {
 /*
 *  To be used to handle sending an error to the client when invalid request param(s) are sent to a handler
  */
-func invalidRequestParams(errors []string) error {
+func InvalidRequestParams(errors []string) error {
 	if len(errors) == 0 {
 		return nil
 	}

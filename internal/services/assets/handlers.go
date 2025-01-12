@@ -38,12 +38,16 @@ func NewHandler(service AssetsServiceInterface, validator lib.ValidatorServiceIn
 
 // HandleGetAllAssets retrieves all assets with pagination
 func (h *AssetsHandler) HandleGetAllAssets(c echo.Context) error {
-	var req repository.GetAllAssetsPaginatedParams
+	var req GetAllAssetsPaginatedRequest
 
-	err := lib.ValidateParams(c, h.Validator, req)
+	err := lib.ValidateParams(c, h.Validator, &req)
+	lib.Logger.Info().Msgf("error recieed %+v", err)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
+
+	// Apply default values for limit and offset
+	req.ApplyDefaults()
 
 	assets, err := h.Service.GetAllAssets(c, int(req.Limit), int(req.Offset))
 	if err != nil {
@@ -55,12 +59,15 @@ func (h *AssetsHandler) HandleGetAllAssets(c echo.Context) error {
 
 // HandleGetPublicAssets retrieves public assets with pagination
 func (h *AssetsHandler) HandleGetPublicAssets(c echo.Context) error {
-	var req repository.GetPublicAssetsPaginatedParams
+	var req GetAllAssetsPaginatedRequest
 
-	err := lib.ValidateParams(c, h.Validator, req)
+	err := lib.ValidateParams(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
+	// Apply default values for limit and offset
+	req.ApplyDefaults()
+
 	assets, err := h.Service.GetPublicAssets(c, int(req.Limit), int(req.Offset))
 	if err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
@@ -88,7 +95,7 @@ func (h *AssetsHandler) HandleGetAssetByID(c echo.Context) error {
 func (h *AssetsHandler) HandleGetAssetByFileName(c echo.Context) error {
 	var req GetAssetByFileNameRequest
 
-	err := lib.ValidateParams(c, h.Validator, req)
+	err := lib.ValidateParams(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
@@ -103,9 +110,9 @@ func (h *AssetsHandler) HandleGetAssetByFileName(c echo.Context) error {
 
 // HandleCreateAsset creates a new asset
 func (h *AssetsHandler) HandleCreateAsset(c echo.Context) error {
-	var req repository.InsertAssetParams
+	var req InsertAssetRequest
 
-	err := lib.ValidateParams(c, h.Validator, req)
+	err := lib.ValidateParams(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
@@ -121,8 +128,8 @@ func (h *AssetsHandler) HandleCreateAsset(c echo.Context) error {
 // HandleUpdateAsset updates an existing asset
 func (h *AssetsHandler) HandleUpdateAsset(c echo.Context) error {
 	var req repository.UpdateAssetParams
-
-	err := lib.ValidateParams(c, h.Validator, req)
+	lib.Logger.Info().Msgf("input values: %+v", req)
+	err := lib.ValidateParams(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
@@ -139,7 +146,7 @@ func (h *AssetsHandler) HandleUpdateAsset(c echo.Context) error {
 func (h *AssetsHandler) HandleDeleteAsset(c echo.Context) error {
 	var req DeleteAssetRequest
 
-	err := lib.ValidateParams(c, h.Validator, req)
+	err := lib.ValidateParams(c, h.Validator, &req)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
