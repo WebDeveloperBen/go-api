@@ -19,7 +19,7 @@ func TestPresenceHandler(t *testing.T) {
 	queries := repository.New(deps.DB)
 	presenceStorage := presence.NewStorage(queries)
 	presenceService := presence.NewService(presenceStorage)
-	presenceHandler := presence.NewHandler(presenceService, deps.Validator)
+	presenceHandler := presence.NewHandler(presenceService, *deps.Validator)
 	presence.NewRouter(api, presenceHandler)
 
 	/**
@@ -118,14 +118,6 @@ func TestPresenceHandler(t *testing.T) {
 			expectedStatus: http.StatusCreated,
 			expectedBody:   `"last_status":"online"`,
 		},
-		{
-			name:           "Invalid request - missing payload",
-			method:         http.MethodPost,
-			path:           "/api/v1/presence",
-			body:           nil,
-			expectedStatus: http.StatusUnprocessableEntity,
-			expectedBody:   `{"error":{"last_status":"last_status is a required field","user_id":"user_id is a required field"},"request_id":""}`,
-		},
 	}
 
 	for _, tt := range tests {
@@ -143,4 +135,29 @@ func TestPresenceHandler(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("Presence Handler - Missing Parameters", func(t *testing.T) {
+		// Define an empty payload
+		body := map[string]interface{}{}
+
+		// Perform the request
+		rec, err := test_utils.PerformRequest(app, "POST", "/api/v1/presence", body, nil)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		// Parse the error response
+		errors := test_utils.ParseErrorsFromResponse(t, rec)
+
+		// Build the errors map using the helper
+		errorsMap := test_utils.BuildErrorsMap(t, errors)
+
+		// Expected validation errors
+		expectedErrors := map[string]interface{}{
+			"last_status": "last_status is a required field",
+			"user_id":     "user_id is a required field",
+		}
+
+		// Assert all expected errors exist
+		test_utils.AssertFieldsExist(t, errorsMap, expectedErrors)
+	})
 }

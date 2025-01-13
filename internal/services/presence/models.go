@@ -16,3 +16,11 @@ type CreatePresenceRequest struct {
 	LastLogin  *time.Time `json:"last_login"`
 	LastLogout *time.Time `json:"last_logout"`
 }
+
+type UpdatePresenceRequest struct {
+	ID         string     `param:"id"`
+	UserID     uuid.UUID  `json:"user_id"`
+	LastStatus string     `json:"last_status"`
+	LastLogin  *time.Time `json:"last_login"`
+	LastLogout *time.Time `json:"last_logout"`
+}

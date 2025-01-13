@@ -1,6 +1,8 @@
 package presence
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	repository "github.com/webdeveloperben/go-api/internal/repository/generated"
@@ -9,11 +11,13 @@ import (
 // Interface for the presence service
 type PresenceServiceInterface interface {
 	GetPresences(ctx echo.Context) ([]repository.GetAllPresenceRow, error)
-	GetPresence(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error)
+	GetPresenceByID(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error)
 	CreatePresence(ctx echo.Context, presence repository.InsertPresenceParams) error
-	UpdatePresence(ctx echo.Context, presence repository.UpdatePresenceParams) error
+	UpdatePresence(ctx echo.Context, presence UpdatePresenceRequest) error
 	DeletePresence(ctx echo.Context, id uuid.UUID) error
 }
+
+var _ PresenceServiceInterface = (*PresenceService)(nil)
 
 type PresenceService struct {
 	Storage PresenceStorageInterface
@@ -32,7 +36,7 @@ func (s *PresenceService) GetPresences(ctx echo.Context) ([]repository.GetAllPre
 }
 
 // GetPresence retrieves a presence record by ID
-func (s *PresenceService) GetPresence(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error) {
+func (s *PresenceService) GetPresenceByID(ctx echo.Context, id uuid.UUID) (*repository.GetPresenceByIDRow, error) {
 	return s.Storage.GetPresenceByID(ctx.Request().Context(), id)
 }
 
@@ -42,8 +46,19 @@ func (s *PresenceService) CreatePresence(ctx echo.Context, presence repository.I
 }
 
 // UpdatePresence updates an existing presence record
-func (s *PresenceService) UpdatePresence(ctx echo.Context, presence repository.UpdatePresenceParams) error {
-	return s.Storage.UpdatePresence(ctx.Request().Context(), presence)
+func (s *PresenceService) UpdatePresence(ctx echo.Context, req UpdatePresenceRequest) error {
+	parsedUUID, err := uuid.Parse(req.ID)
+	if err != nil {
+		return fmt.Errorf("invalid uuid: %v", err)
+	}
+	// Map InsertAssetRequest to InsertAssetParams
+	params := repository.UpdatePresenceParams{
+		UserID:     parsedUUID,
+		LastStatus: req.LastStatus,
+		LastLogin:  req.LastLogin,
+		LastLogout: req.LastLogout,
+	}
+	return s.Storage.UpdatePresence(ctx.Request().Context(), params)
 }
 
 // DeletePresence deletes a presence record by ID

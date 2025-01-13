@@ -17,6 +17,8 @@ type PresenceHandlerInterface interface {
 	HandleDeletePresence(c echo.Context) error
 }
 
+var _ PresenceHandlerInterface = (*PresenceHandler)(nil)
+
 // Handler struct
 type PresenceHandler struct {
 	Service   PresenceServiceInterface
@@ -43,17 +45,12 @@ func (h *PresenceHandler) HandleGetPresences(c echo.Context) error {
 
 // Get presence by ID
 func (h *PresenceHandler) HandleGetPresence(c echo.Context) error {
-	parsedUUID, err := lib.GetUUIDParam(c, "id")
+	parsedUUID, err := lib.GetValidUUIDParam(c, "id")
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
-	req := GetPresenceRequest{ID: parsedUUID}
-	if err := lib.ValidateRequest(h.Validator, req); err != nil {
-		return lib.WriteError(c, http.StatusBadRequest, err)
-	}
-
-	presence, err := h.Service.GetPresence(c, parsedUUID)
+	presence, err := h.Service.GetPresenceByID(c, parsedUUID)
 	if err != nil {
 		return lib.WriteError(c, http.StatusInternalServerError, err)
 	}
@@ -65,23 +62,20 @@ func (h *PresenceHandler) HandleGetPresence(c echo.Context) error {
 
 func (h *PresenceHandler) HandleCreatePresence(c echo.Context) error {
 	var req CreatePresenceRequest
-	if err := c.Bind(&req); err != nil {
-		return lib.InvalidJSON(c)
+
+	err := lib.ValidateInputs(c, h.Validator, &req)
+	if err != nil {
+		return lib.WriteError(c, http.StatusUnprocessableEntity, err)
 	}
 
-	if err := lib.ValidateRequest(h.Validator, req); err != nil {
-		return err
-		// TODO: fix return lib.InvalidRequest(c, err)
-	}
-
-	parsedUUID, err := lib.ParseUUID(req.UserID)
+	id, err := lib.ParseUUID(req.UserID)
 	if err != nil {
 		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
 	presence := repository.InsertPresenceParams{
 		LastStatus: req.LastStatus,
-		UserID:     parsedUUID,
+		UserID:     id,
 		LastLogin:  req.LastLogin,
 		LastLogout: req.LastLogout,
 	}
@@ -95,14 +89,11 @@ func (h *PresenceHandler) HandleCreatePresence(c echo.Context) error {
 
 // Update presence record
 func (h *PresenceHandler) HandleUpdatePresence(c echo.Context) error {
-	var req repository.UpdatePresenceParams
-	if err := c.Bind(&req); err != nil {
-		return lib.WriteError(c, http.StatusBadRequest, err)
-	}
+	var req UpdatePresenceRequest
 
-	if err := lib.ValidateRequest(h.Validator, req); err != nil {
-		return err
-		// TODO: fix return lib.InvalidRequest(c, err)
+	err := lib.ValidateInputs(c, h.Validator, &req)
+	if err != nil {
+		return lib.WriteError(c, http.StatusBadRequest, err)
 	}
 
 	if err := h.Service.UpdatePresence(c, req); err != nil {

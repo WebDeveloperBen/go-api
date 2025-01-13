@@ -10,6 +10,15 @@ import (
 	"github.com/webdeveloperben/go-api/internal/services/assets"
 )
 
+// MockValidatorService is a mock implementation of the ValidatorServiceInterface.
+type MockValidatorService struct{}
+
+// Validate is a mock implementation of the Validate method.
+func (m *MockValidatorService) Validate(data interface{}) []lib.ValidatorErrorResponse {
+	// Return an empty slice to simulate successful validation
+	return []lib.ValidatorErrorResponse{}
+}
+
 // Test struct with validation tags
 type TestStruct struct {
 	ID    string `json:"id" validate:"required,uuid"`

@@ -119,27 +119,6 @@ func ValidateRequest(v ValidatorServiceInterface, data interface{}) error {
 	return nil
 }
 
-/* DecodeAndValidateInputs unmarshalles a json payload and validates it, useful when needing to combine path params and json payloads into the struct to pass into the service */
-// func DecodeAndValidateInputs(c echo.Context, v ValidatorServiceInterface, target interface{}) error {
-// 	// Read the request body
-// 	body, err := io.ReadAll(c.Request().Body)
-// 	if err != nil {
-// 		return fmt.Errorf("failed to read request body: %w", err)
-// 	}
-//
-// 	// Decode JSON payload into the provided struct
-// 	if err := json.Unmarshal(body, target); err != nil {
-// 		return fmt.Errorf("invalid JSON request: %w", err)
-// 	}
-//
-// 	// Validate the decoded payload
-// 	if err := ValidateRequest(v, target); err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
-
 /* formatValidationErrors returns an error map of the validation errors */
 func formatValidationErrors(errors []ValidatorErrorResponse) map[string]string {
 	errorMap := make(map[string]string)

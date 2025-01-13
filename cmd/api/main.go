@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/webdeveloperben/go-api/internal/config"
 	"github.com/webdeveloperben/go-api/internal/lib"
 
@@ -18,8 +19,14 @@ func main() {
 	// Load configuration
 	cfg := config.Envs
 
+	// Create Validator
+	validator, err := lib.NewValidatorService(validator.New(validator.WithRequiredStructEnabled()))
+	if err != nil {
+		lib.Logger.Fatal().Err(err).Msg("error initializing validator service")
+		log.Fatalf("failed to initialize validator service: %v", err)
+	}
 	// Create application
-	app, deps, err := lib.CreateApi(ctx, cfg)
+	app, deps, err := lib.CreateApi(ctx, cfg, validator)
 	if err != nil {
 		log.Fatalf("Failed to create application: %v", err)
 	}
@@ -33,12 +40,12 @@ func main() {
 	/* Initialize and attach the routes to the api */
 	presenceStorage := presence.NewStorage(queries)
 	presenceService := presence.NewService(presenceStorage)
-	presenceHandler := presence.NewHandler(presenceService, deps.Validator)
+	presenceHandler := presence.NewHandler(presenceService, validator)
 	presence.NewRouter(api, presenceHandler)
 
 	assetsStorage := assets.NewStorage(queries)
 	assetsService := assets.NewService(assetsStorage)
-	assetsHandler := assets.NewHandler(assetsService, deps.Validator)
+	assetsHandler := assets.NewHandler(assetsService, validator)
 	assets.NewRouter(api, assetsHandler)
 
 	// Start server

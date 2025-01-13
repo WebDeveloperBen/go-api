@@ -19,6 +19,8 @@ type PresenceStorageInterface interface {
 	UpdateLogoutTime(ctx context.Context, params repository.UpdateLogoutTimeParams) error
 }
 
+var _ PresenceStorageInterface = (*PresenceStorage)(nil)
+
 type PresenceStorage struct {
 	Queries *repository.Queries
 }

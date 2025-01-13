@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -13,11 +12,11 @@ import (
 )
 
 type AppDependencies struct {
-	Validator *ValidatorService
+	Validator *ValidatorServiceInterface
 	DB        *pgxpool.Pool
 }
 
-func CreateApi(ctx context.Context, cfg config.Config) (*echo.Echo, *AppDependencies, error) {
+func CreateApi(ctx context.Context, cfg config.Config, v ValidatorServiceInterface) (*echo.Echo, *AppDependencies, error) {
 	// Initialize logger
 	isProd := config.Envs.IsProd
 	logger := NewLogger(isProd)
@@ -56,19 +55,12 @@ func CreateApi(ctx context.Context, cfg config.Config) (*echo.Echo, *AppDependen
 
 	app.Pre(middleware.RemoveTrailingSlash())
 
-	// Create Validator
-	validatorSvc, err := NewValidatorService(validator.New(validator.WithRequiredStructEnabled()))
-	if err != nil {
-		logger.Fatal().Err(err).Msg("error initializing validator service")
-		return nil, nil, fmt.Errorf("failed to initialize validator service: %w", err)
-	}
-
 	// Log successful initialization
 	logger.Info().Msg("API application initialized successfully")
 
 	// Return Echo instance and shared dependencies
 	return app, &AppDependencies{
-		Validator: validatorSvc,
+		Validator: &v,
 		DB:        conn,
 	}, nil
 }

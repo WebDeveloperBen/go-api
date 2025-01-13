@@ -22,7 +22,7 @@ func TestAssetHandler(t *testing.T) {
 	queries := repository.New(deps.DB)
 	storage := assets.NewStorage(queries)
 	service := assets.NewService(storage)
-	handler := assets.NewHandler(service, deps.Validator)
+	handler := assets.NewHandler(service, *deps.Validator)
 	assets.NewRouter(api, handler)
 
 	/**
